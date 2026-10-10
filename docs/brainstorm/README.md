@@ -1,24 +1,24 @@
 # Atabey Brainstorm
 
 > Brainstorming history for **Atabey** *(the Seljuk guardian-tutor of princes; "Atelier" was dropped in v0.3)*: a Tauri desktop app that explains any codebase in a rich GUI and builds features through spec-driven, multi-agent development, with built-in mentorship and practice.
-> **Phase:** brainstorming **complete** (2026-10-10). Now: **S0 spec review**, then implementation. No code yet.
+> **Phase:** brainstorming **complete**, and the S0 spec is **frozen** (2026-10-10). **Implementation of S0 has started.** This folder is now history; living documents are at the repo root.
 
 ## Where we are
 
 | | |
 |---|---|
-| **Current session** | [v0.5](v0.5/SUMMARY.md) (open): S0 spec review & freeze |
-| **Waiting on** | User's answers in [v0.5/03-OPEN-QUESTIONS.md](v0.5/03-OPEN-QUESTIONS.md) |
+| **Last session** | [v0.5](v0.5/SUMMARY.md) (closed): S0 spec review & freeze. All answers accepted |
+| **Now** | S0 implementation, task by task ([S0 spec §6](../../specs/S0-foundations.md#6-tasks)) |
 | **All decisions** | [DECISIONS.md](DECISIONS.md) |
-| **Project documents** | [PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) (frozen) · [CONSTITUTION.md](../../CONSTITUTION.md) (frozen) · [S0 spec](../../specs/S0-foundations.md) (draft) · [ROADMAP.md](../../ROADMAP.md) · [PARKING-LOT.md](../../PARKING-LOT.md) |
-| **Next planned** | Freeze S0 → T-01 (workspace skeleton) |
+| **Project documents** | [PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) (frozen v1.1.0) · [CONSTITUTION.md](../../CONSTITUTION.md) (frozen v1.1.0) · [S0 spec](../../specs/S0-foundations.md) (frozen v1.0.0) · [ROADMAP.md](../../ROADMAP.md) · [PARKING-LOT.md](../../PARKING-LOT.md) |
+| **Next planned** | T-01 (workspace skeleton) |
 
 ## 📌 Action items for the user
 
 | Item | Status |
 |---|---|
 | Put this folder under git ([steps](v0.4/07-ACTION-GIT-INIT.md)) | ✅ done (`outputs/`: v0.5-Q8) |
-| Create the GitHub repo + push + $0 Actions budget ([steps](v0.5/04-ACTION-GITHUB-REPO.md)) | ⏳ after v0.5-Q6 |
+| Create the **public** GitHub repo + push ([steps](v0.5/04-ACTION-GITHUB-REPO.md)) | ⏳ todo (needed for PRs + CI) |
 | Trademark/domain check of "Atabey" before going public | ⏳ later |
 | ~~Email roadmap.sh's founder~~ | ❌ cancelled (v0.3-Q27, D-114) |
 
@@ -30,7 +30,7 @@
 | [v0.2](v0.2/SUMMARY.md) | 2026-10-07 | Answers processed, clarifications, priorities re-ordered, new pillars | closed |
 | [v0.3](v0.3/SUMMARY.md) | 2026-10-07 | New name, extensions, quality pipeline, decision models, Talimhane, build process | closed |
 | [v0.4](v0.4/SUMMARY.md) | 2026-10-09 | Claude Code first, native-first v1 over ACP, Ulak messaging, Product Spec + Constitution drafts | closed |
-| [v0.5](v0.5/SUMMARY.md) | 2026-10-10 | Brainstorming ends; Product Spec + Constitution frozen; detailed S0 spec drafted | open |
+| [v0.5](v0.5/SUMMARY.md) | 2026-10-10 | Brainstorming ends; Product Spec + Constitution frozen; detailed S0 spec drafted | closed |
 
 ## How this folder works
 

@@ -1,6 +1,6 @@
 # Atabey — Standing Instructions
 
-This repo is in the **implementation-planning phase** for **Atabey** *(name decided in v0.4, D-006; a trademark check is still due before going public)*. Brainstorming ended on 2026-10-10. The S0 spec is under review, and code starts after it's frozen. Atabey is a Tauri desktop app (Rust core + React/TypeScript GUI) that explains any codebase in a rich GUI (purpose #1) and builds features through spec-driven, multi-agent development (purpose #2), with mentorship and practice. There is no application code yet.
+This repo is in the **implementation phase** for **Atabey** *(name decided in v0.4, D-006; a trademark check is still due before going public)*. Brainstorming ended on 2026-10-10, and the S0 spec (`specs/S0-foundations.md`) is frozen. Work proceeds task by task (T-01 …), with one branch and one PR per task (D-126). Atabey is a Tauri desktop app (Rust core + React/TypeScript GUI) that explains any codebase in a rich GUI (purpose #1) and builds features through spec-driven, multi-agent development (purpose #2), with mentorship and practice. There is no application code yet.
 
 ## Start of every session (do this first)
 
@@ -46,6 +46,6 @@ Every question has: context, a **🔎 What others do** line, checkbox options ma
 
 - **Never send emails, messages or posts on the user's behalf.** Draft them in an `ACTION` file with instructions; the user sends them.
 - Don't use `.pi/` or `outputs/` as sources for the brainstorm (user instruction, 2026-10-07).
-- Don't write application code until the S0 spec is frozen (v0.5-Q12) and the user asks to start T-01.
+- Only implement the current task of the active slice spec. Put new ideas in `PARKING-LOT.md`.
 - Never edit a frozen document (`PRODUCT-SPEC.md`, `CONSTITUTION.md`, frozen specs) directly. Add a proposed amendment row and ask in the next question round.
 - The folder is a git repo (`main`, since 2026-10-09; D-104). Commit only when the user asks. Other repo-structure changes still need the user's OK.

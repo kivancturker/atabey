@@ -1,9 +1,9 @@
 ---
 doc: product-spec
 status: frozen
-version: 1.0.0
+version: 1.1.0
 frozen: 2026-10-10
-approved-in: v0.4-Q8 (accepted as drafted, round-4 answers applied)
+approved-in: v0.4-Q8 (accepted as drafted, round-4 answers applied); A-1 approved v0.5-Q10
 source: docs/brainstorm/DECISIONS.md
 ---
 
@@ -138,7 +138,7 @@ Built as vertical slices S0 → S9; each slice ships engine + GUI together. *(D-
 | Kurultay judge | OpenCode headless | Strongest Go model; **escalate button → Opus 5.5 via API key** | Included / pay-per-token |
 | Talimhane apprentice | OpenCode via ACP | Cheap, weak Go model (user can change) | Included |
 | Decision model (command gate etc.) | Core wrapper | **Jev via OpenRouter**; fail-closed | ~$0 |
-| Explanations, narratives, lessons | Core LLM gateway | Cheap Go / OpenRouter models | Metered |
+| Explanations, narratives, lessons | Core LLM gateway | Cheap **OpenRouter** models (OpenCode Go only via the OpenCode runtime, never called directly) *(A-1)* | Metered |
 
 **Ban-safe rule** *(D-041, refined)*: subscriptions only through the vendor's **unmodified** binary, signed in through the **vendor's own flow**; Atabey never reads, stores or forwards subscription credentials, and never offers its own "Sign in with …" for a vendor.
 
@@ -262,5 +262,5 @@ flowchart TB
 
 | ID | Date | Change | Why | Status |
 |---|---|---|---|---|
-| A-1 | 2026-10-10 | §7 last row: direct gateway calls (explanations, narratives, lessons) use **OpenRouter** models. **OpenCode Go is used only through the OpenCode runtime** (`opencode run` / `serve` / `acp`), never called directly by the gateway | OpenCode Go's docs say it's "designed for OpenCode and other coding agents" and monitor traffic for abuse. Direct non-agent calls from our gateway are the "homemade client" risk rejected in v0.4-Q4 | 🟡 proposed: v0.5-Q10 |
+| A-1 | 2026-10-10 | §7 last row: direct gateway calls (explanations, narratives, lessons) use **OpenRouter** models. **OpenCode Go is used only through the OpenCode runtime** (`opencode run` / `serve` / `acp`), never called directly by the gateway | OpenCode Go's docs say it's "designed for OpenCode and other coding agents" and monitor traffic for abuse. Direct non-agent calls from our gateway are the "homemade client" risk rejected in v0.4-Q4 | ✅ approved (v0.5-Q10) → v1.1.0 |
 
