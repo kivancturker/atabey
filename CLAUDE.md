@@ -1,51 +1,40 @@
-# Atabey — Standing Instructions
+# Atabey: Standing Instructions for Claude
 
-This repo is in the **implementation phase** for **Atabey** *(name decided in v0.4, D-006; a trademark check is still due before going public)*. Brainstorming ended on 2026-10-10, and the S0 spec (`specs/S0-foundations.md`) is frozen. Work proceeds task by task (T-01 …), with one branch and one PR per task (D-126). Atabey is a Tauri desktop app (Rust core + React/TypeScript GUI) that explains any codebase in a rich GUI (purpose #1) and builds features through spec-driven, multi-agent development (purpose #2), with mentorship and practice. There is no application code yet.
+@AGENTS.md
 
-## Start of every session (do this first)
+## Phase
 
-Read, in order:
+**Implementation of S0** (since 2026-10-10). Brainstorming is complete. Its history is in `docs/brainstorm/` and the decision ledger is `docs/brainstorm/DECISIONS.md`. The name **Atabey** is decided (D-006); a trademark check is due before going public.
 
-1. `docs/brainstorm/README.md`: current session, status, user action items
+## Start of every session
+
+1. `docs/brainstorm/README.md`: status and **user action items**
 2. `docs/brainstorm/DECISIONS.md`: the authoritative decision ledger
-3. The latest `docs/brainstorm/vX.Y/SUMMARY.md`
-4. The latest session's open-questions file. The user may have written answers into it.
-5. Project documents at the root: `PRODUCT-SPEC.md` and `CONSTITUTION.md` (frozen; change only via amendments), `ROADMAP.md`, `PARKING-LOT.md`, and the active slice spec in `specs/`.
+3. `ROADMAP.md` and the active slice spec (`specs/`): which task is next
+4. `git status` / current branch: is a task already in progress?
 
-Open older session files only when you need detail. Summaries exist so the full history doesn't have to be re-read.
+## Design rounds (question files)
 
-## Brainstorm workflow (user's standing instruction, 2026-10-07)
+The brainstorm Q&A format continues for **slice spec reviews** (e.g., the S1 spec). Each round is a new versioned folder `docs/brainstorm/vX.Y/` with `SUMMARY.md`, `01-CLARIFICATIONS.md` (answer every `❓ Clarify` and react to every custom answer), numbered proposal files, an open-questions file (IDs prefixed with the session, e.g., `v0.6-Q3`) and `NN-ACTION-*.md` for things the user must do.
 
-- **Every brainstorming session gets its own versioned folder:** `docs/brainstorm/v0.1/`, `docs/brainstorm/v0.2/`, … Increment the minor version per session.
-- **Closed session folders are frozen history.** Don't edit them, except that the user writes answers into a session's open-questions file, and a closed session's `SUMMARY.md` status is set to `closed`.
-- When the user says the answers are ready (or asks to continue), read **all** their answers thoroughly (checkboxes, custom answers, clarify requests, and free-text ideas), then create the next version folder containing:
-  - `SUMMARY.md` (frontmatter: session, date, status, previous; plus key changes and open items)
-  - `01-CLARIFICATIONS.md`: answer every `❓ Clarify` and react to every custom answer
-  - One or more numbered proposal files (`02-…`, `03-…`): only what changed or is new; link back for the rest. Split by area when there's a lot
-  - An open-questions file for the next round (question IDs prefixed with the session, e.g., `v0.3-Q5`)
-  - `NN-ACTION-*.md` files for things **the user** must do themselves
-- At the end of every session: **update `docs/brainstorm/DECISIONS.md`** (IDs are permanent: never renumber or delete; mark superseded rows ⛔ and point to the new ID), **update `docs/brainstorm/README.md`** (session table, status, action items), and mark the previous session's `SUMMARY.md` `status: closed`.
-- Save the user's own pasted ideas verbatim when they provide new source material (as in `v0.1/00-ORIGINAL-IDEA.md`).
-
-## Question file format
-
-Every question has: context, a **🔎 What others do** line, checkbox options marked ⭐⭐ (strongly recommended) / ⭐ (recommended) / ⚪ (viable) / ⚠️ (not recommended), then `✍️ Custom answer:` and `❓ Clarify:` lines. A blank answer means the ⭐ recommendation is used. The user says "answers ready" when done.
+- **Closed session folders are frozen history.** The only edits allowed are the user writing answers into an open-questions file, and setting a closing session's `SUMMARY.md` status to `closed`.
+- At the end of a round: update `docs/brainstorm/DECISIONS.md` (IDs permanent; superseded rows ⛔ with a pointer), update `docs/brainstorm/README.md`, and close the previous session.
+- **Question format:** context, a **🔎 What others do** line, checkbox options marked ⭐⭐ / ⭐ / ⚪ / ⚠️, then `✍️ Custom answer:` and `❓ Clarify:`. A blank answer means the ⭐⭐/⭐ recommendation is used.
 
 ## How to write for this user
 
 - **Always compare with how popular harnesses, IDEs and tools handle each topic**, with pros and cons: Claude Code, Codex CLI, OpenCode, Gemini CLI, Cursor, Kiro, Zed, GitHub Spec Kit, Cline, VS Code, Neovim, etc.
-- **Rich formatting only:** tables, Mermaid diagrams, clear headings. **Never ASCII-art diagrams.**
-- Explain concepts simply. Give a short plain-language answer first, then the detail.
-- Use **production-grade, real-world examples**, never toy ones (Animal/Dog/Cat, Foo/Bar).
-- **Verify time-sensitive facts** (pricing, terms of service and ban rules, protocol support, licenses, product names) with a web search before stating them. Date them and cite sources in the doc.
-- Respect the budget: the user can't spend more than about $3/day on AI and prefers OpenCode Go ($10/mo). Flag costs in proposals.
-- Agent roles (D-113): **Claude Code** (the user's own subscription) is the main coding agent; **OpenCode Go** models run the observers, judge and apprentice. Check every design against the ban-safe rule in D-041.
-- When brainstorming ends and implementation planning starts, produce a **very detailed technical spec and roadmap** (crates, modules, types, IPC, tasks) before any code. The user asked for this explicitly.
+- **Rich formatting only:** tables, Mermaid diagrams, clear headings. **Never ASCII-art diagrams** (no box-drawing file trees either; use tables).
+- Explain concepts simply. Give a short plain-language answer first, then the detail. The user is learning harness internals.
+- Use **production-grade, real-world examples**, never toy ones.
+- **Verify time-sensitive facts** (pricing, terms of service, protocol support, licenses, product names, **library versions**) before stating or pinning them. Date them and cite sources.
+- **Budget:** about $3/day for AI. The user is on **Claude Pro** (the tightest limits) + **OpenCode Go** ($10/mo). Flag costs. Keep tasks small enough for one session.
+- Agent roles (D-113): **Claude Code** is the main coding agent; OpenCode Go models run the observers, judge and apprentice, and only ever through the OpenCode runtime (Product Spec A-1). Check designs against the ban-safe rule (D-041).
 
 ## Don't
 
-- **Never send emails, messages or posts on the user's behalf.** Draft them in an `ACTION` file with instructions; the user sends them.
-- Don't use `.pi/` or `outputs/` as sources for the brainstorm (user instruction, 2026-10-07).
-- Only implement the current task of the active slice spec. Put new ideas in `PARKING-LOT.md`.
-- Never edit a frozen document (`PRODUCT-SPEC.md`, `CONSTITUTION.md`, frozen specs) directly. Add a proposed amendment row and ask in the next question round.
-- The folder is a git repo (`main`, since 2026-10-09; D-104). Commit only when the user asks. Other repo-structure changes still need the user's OK.
+- **Never send emails, messages or posts on the user's behalf**, and never create or push to public repositories without the user's explicit OK. Draft instructions in an `ACTION` file instead.
+- Don't use `.pi/` or `outputs/` as sources.
+- Only implement the current task. New ideas go to `PARKING-LOT.md`.
+- Never edit a frozen document directly (`PRODUCT-SPEC.md`, `CONSTITUTION.md`, frozen specs). Propose an amendment row and ask.
+- Commit only on **task branches** (D-126) or when the user asks; never directly to `main`. Other repo-structure changes need the user's OK.

@@ -23,6 +23,17 @@ source: PRODUCT-SPEC.md (v1.1.0) §4–5 · docs/brainstorm/DECISIONS.md D-025, 
 | 🏁 | **v1.0** | Native GUI (ACP) by default + Terminal layout fallback | | |
 | | **v2.0** | More doc types, CD recipes, public Talimhane library, more agents | | |
 
+## S0 progress
+
+| Milestone | Tasks | Status |
+|---|---|---|
+| M1 Skeleton & CI | T-01 workspace skeleton · T-02 Tauri shell + CI · T-03 types + codegen · T-04 iframe spike | 🚧 T-01 in review |
+| M2 Core services | T-05 … T-10 | ⏳ |
+| M3 Documents & themes | T-11 … T-17 | ⏳ |
+| M4 Budget & gateway | T-18, T-19 | ⏳ |
+| M5 Extensions & Ulak | T-20 … T-23 | ⏳ |
+| M6 Hardening & demo | T-24 … T-26 | ⏳ |
+
 ```mermaid
 flowchart LR
   S0[S0 Foundations] --> S1[S1 Orhun] --> S2[S2 Agent Session] --> S3[S3 Divan + Tuğra] --> S4[S4 Quality] --> S5[S5 Kurultay]

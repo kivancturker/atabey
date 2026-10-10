@@ -1,0 +1,41 @@
+# Toolchain pins (D-103, ADR-0006). Rust is pinned in rust-toolchain.toml.
+# Setup: `mise install`, then `pnpm install`. Everyday gate: `mise run check`.
+
+[tools]
+node = "24.21.0"                                  # Active LTS
+pnpm = "12.10.1"
+cargo-deny = "0.20.2"                             # licenses + advisories (Constitution Art. 10)
+gitleaks = "8.30.1"                               # secret scan (Constitution Art. 5)
+"aqua:nextest-rs/nextest/cargo-nextest" = "0.9.148"
+cargo-insta = "1.49.0"                            # snapshot review (S0 T-11+)
+
+[tasks.fmt]
+description = "Format Rust and TypeScript/JSON"
+run = ["cargo fmt --all", "pnpm exec biome format --write ."]
+
+[tasks.lint]
+description = "Formatting check, clippy, Biome"
+run = [
+  "cargo fmt --all --check",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "pnpm exec biome check .",
+]
+
+[tasks.deny]
+description = "License and advisory policy (deny.toml)"
+run = "cargo deny check"
+
+[tasks.secrets]
+description = "Scan git history for secrets"
+run = "gitleaks git --no-banner --redact"
+
+[tasks.test]
+description = "Rust and TypeScript tests"
+run = [
+  "cargo nextest run --workspace --no-tests=pass",
+  "pnpm -r --if-present test",
+]
+
+[tasks.check]
+description = "Everything CI runs, locally"
+depends = ["lint", "deny", "secrets", "test"]

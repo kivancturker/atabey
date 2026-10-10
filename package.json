@@ -1,0 +1,16 @@
+{
+  "name": "atabey",
+  "private": true,
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@12.10.1",
+  "engines": {
+    "node": ">=24.21.0"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15"
+  }
+}
