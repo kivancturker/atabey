@@ -1,21 +1,22 @@
 # Atabey — Standing Instructions
 
-This repo is in the **brainstorming phase** for **Atabey** *(name decided in v0.4, D-006; a trademark check is still due before going public)*. Atabey is a Tauri desktop app (Rust core + React/TypeScript GUI) that explains any codebase in a rich GUI (purpose #1) and builds features through spec-driven, multi-agent development (purpose #2), with mentorship and practice. There is no application code yet.
+This repo is in the **implementation-planning phase** for **Atabey** *(name decided in v0.4, D-006; a trademark check is still due before going public)*. Brainstorming ended on 2026-10-10. The S0 spec is under review, and code starts after it's frozen. Atabey is a Tauri desktop app (Rust core + React/TypeScript GUI) that explains any codebase in a rich GUI (purpose #1) and builds features through spec-driven, multi-agent development (purpose #2), with mentorship and practice. There is no application code yet.
 
 ## Start of every session (do this first)
 
 Read, in order:
 
-1. `brainstorm/README.md`: current session, status, user action items
-2. `brainstorm/DECISIONS.md`: the authoritative decision ledger
-3. The latest `brainstorm/vX.Y/SUMMARY.md`
+1. `docs/brainstorm/README.md`: current session, status, user action items
+2. `docs/brainstorm/DECISIONS.md`: the authoritative decision ledger
+3. The latest `docs/brainstorm/vX.Y/SUMMARY.md`
 4. The latest session's open-questions file. The user may have written answers into it.
+5. Project documents at the root: `PRODUCT-SPEC.md` and `CONSTITUTION.md` (frozen; change only via amendments), `ROADMAP.md`, `PARKING-LOT.md`, and the active slice spec in `specs/`.
 
 Open older session files only when you need detail. Summaries exist so the full history doesn't have to be re-read.
 
 ## Brainstorm workflow (user's standing instruction, 2026-10-07)
 
-- **Every brainstorming session gets its own versioned folder:** `brainstorm/v0.1/`, `brainstorm/v0.2/`, … Increment the minor version per session.
+- **Every brainstorming session gets its own versioned folder:** `docs/brainstorm/v0.1/`, `docs/brainstorm/v0.2/`, … Increment the minor version per session.
 - **Closed session folders are frozen history.** Don't edit them, except that the user writes answers into a session's open-questions file, and a closed session's `SUMMARY.md` status is set to `closed`.
 - When the user says the answers are ready (or asks to continue), read **all** their answers thoroughly (checkboxes, custom answers, clarify requests, and free-text ideas), then create the next version folder containing:
   - `SUMMARY.md` (frontmatter: session, date, status, previous; plus key changes and open items)
@@ -23,7 +24,7 @@ Open older session files only when you need detail. Summaries exist so the full 
   - One or more numbered proposal files (`02-…`, `03-…`): only what changed or is new; link back for the rest. Split by area when there's a lot
   - An open-questions file for the next round (question IDs prefixed with the session, e.g., `v0.3-Q5`)
   - `NN-ACTION-*.md` files for things **the user** must do themselves
-- At the end of every session: **update `brainstorm/DECISIONS.md`** (IDs are permanent: never renumber or delete; mark superseded rows ⛔ and point to the new ID), **update `brainstorm/README.md`** (session table, status, action items), and mark the previous session's `SUMMARY.md` `status: closed`.
+- At the end of every session: **update `docs/brainstorm/DECISIONS.md`** (IDs are permanent: never renumber or delete; mark superseded rows ⛔ and point to the new ID), **update `docs/brainstorm/README.md`** (session table, status, action items), and mark the previous session's `SUMMARY.md` `status: closed`.
 - Save the user's own pasted ideas verbatim when they provide new source material (as in `v0.1/00-ORIGINAL-IDEA.md`).
 
 ## Question file format
@@ -45,5 +46,6 @@ Every question has: context, a **🔎 What others do** line, checkbox options ma
 
 - **Never send emails, messages or posts on the user's behalf.** Draft them in an `ACTION` file with instructions; the user sends them.
 - Don't use `.pi/` or `outputs/` as sources for the brainstorm (user instruction, 2026-10-07).
-- Don't write application code until the user says brainstorming is done and asks for implementation.
-- The folder is a git repo (`main`, since 2026-10-09; D-104). Commit only when the user asks. Other repo-structure changes, such as moving `brainstorm/` to `docs/brainstorm/`, still need the user's OK (v0.4-Q10).
+- Don't write application code until the S0 spec is frozen (v0.5-Q12) and the user asks to start T-01.
+- Never edit a frozen document (`PRODUCT-SPEC.md`, `CONSTITUTION.md`, frozen specs) directly. Add a proposed amendment row and ask in the next question round.
+- The folder is a git repo (`main`, since 2026-10-09; D-104). Commit only when the user asks. Other repo-structure changes still need the user's OK.

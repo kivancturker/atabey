@@ -1,7 +1,7 @@
 ---
 doc: decision-ledger
-updated: 2026-10-09
-updated-in-session: v0.4
+updated: 2026-10-10
+updated-in-session: v0.5
 ---
 
 # Decision Ledger
@@ -24,7 +24,7 @@ updated-in-session: v0.4
 | D-006 | Name: **Atabey** (Seljuk guardian-tutor of princes) | ✅ | v0.2-Q1 → v0.3-Q1 | Trademark/domain check before going public |
 | D-007 | License **Apache-2.0** | ✅ | v0.2-Q19 | Talimhane scenario content: CC BY 4.0 (D-069) |
 | D-008 | Themed module names **always with a plain-English subtitle** (Orhun, Kurultay, Divan, Tuğra, Defter, Enderun, Talimhane, Bedesten, Kervan, Ulak) | ✅ | v0.3-Q2 | Ulak added in v0.4 |
-| D-109 | **Product Spec + Constitution** drafts (v0.4/04, v0.4/05) become `PRODUCT-SPEC.md` and `CONSTITUTION.md` v1.0 in v0.5 | 🟡 | v0.4-Q8, Q9 | |
+| D-109 | **[PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) and [CONSTITUTION.md](../../CONSTITUTION.md) v1.0.0 frozen** at the repo root | ✅ | v0.4-Q8, Q9 | Amendments A-1 proposed for each: 🟡 v0.5-Q10, Q11 |
 
 ## Platform & Architecture
 
@@ -37,15 +37,15 @@ updated-in-session: v0.4
 | D-014 | **Rust core + TypeScript GUI**, types generated from Rust | ✅ | v0.2-Q2 | |
 | D-015 | GUI framework **React + TypeScript** | ✅ | v0.2-Q3 | |
 | D-016 | **Cross-platform**: macOS primary, Windows supported, **CI on both from S0**; Linux best-effort | ✅ | v0.1-Q8, v0.2-Q18 | |
-| D-017 | v1 uses the agent's own server (OpenCode `serve` + `attach` + SSE); ACP for v2 Native; MCP tools; Claude Code hooks | ✅ | v0.1-Q9, v0.3 | **🔁 v0.4-Q1/Q2 propose D-110**; becomes ⛔ if accepted |
-| D-018 | v1 = Terminal + GUI; v2 = Native mode default + one-click switch back | ✅ | v0.2-Q10, Q21 | **🔁 v0.4-Q1 proposes D-111** |
+| D-017 | ~~v1 uses the agent's own server (OpenCode `serve` + `attach` + SSE); ACP for v2 Native; MCP tools; Claude Code hooks~~ | ⛔ | v0.1-Q9, v0.3 | → D-110 |
+| D-018 | ~~v1 = Terminal + GUI; v2 = Native mode default + one-click switch back~~ | ⛔ | v0.2-Q10, Q21 | → D-111 |
 | D-019 | Repo knowledge folder **`.atabey/`** | ✅ | v0.1-Q10 | Name decided (D-006) |
 | D-020 | **Files = source of truth + SQLite derived index**; user-level `~/.atabey/` for cross-project data | ✅ | v0.2-Q8 | |
 | D-021 | Sandbox: **container for PoC tests**, OS permission prompts for the main agent | ✅ | v0.1-Q11 | + decision gate (D-028) |
 | D-022 | **Rich rendering of everything** (no raw Markdown, no ASCII diagrams) | ✅ | v0.1-Q30 | |
 | D-023 | Document format: **Markdown + frontmatter + typed fenced blocks** (`atabey:*`), schemas from Rust types, auto-migration | ✅ | v0.2-Q7 | |
 | D-024 | ~~Build order S0–S6 (v0.2)~~ | ⛔ | v0.2-Q4 | → D-025 |
-| D-025 | Build order **S0 → S1 Orhun → S2 Session → S3 Divan + Spec → S4 Quality → S5 Kurultay → S6 Enderun → S7 Talimhane → S8 Overlay → S9 Bedesten/Kervan = v1.0** | ✅ | v0.3-Q22 | Slice contents revised by **D-112 🟡** |
+| D-025 | Build order **S0 → S1 Orhun → S2 Session → S3 Divan + Spec → S4 Quality → S5 Kurultay → S6 Enderun → S7 Talimhane → S8 Overlay → S9 Bedesten/Kervan = v1.0** | ✅ | v0.3-Q22 | Slice contents: D-112; living view: [ROADMAP.md](../../ROADMAP.md) |
 | D-026 | ~~First agent: OpenCode~~ | ⛔ | v0.2-Q9 | → D-113 |
 | D-027 | **Core infrastructure + bundled first-party extensions on one public API** (VS Code/Obsidian style); API 0.x until 3+ extensions use it | ✅ | v0.2-Q21 → v0.3-Q3 | |
 | D-028 | **Decision-model wrapper** in core; **Jev via OpenRouter** default; on when a key exists; **escalate-only for security**; **fail-closed** (asks you) when unavailable | ✅ | v0.2-Q21, v0.3-Q7 | In native sessions it answers ACP permission requests (D-110) |
@@ -53,14 +53,14 @@ updated-in-session: v0.4
 | D-090 | Code intelligence: **tree-sitter (always) + live LSP + SCIP snapshots at feature/phase end**; own cache keyed by content hash + commit | ✅ | v0.3-Q6 | |
 | D-091 | **Theme system from S0** (semantic tokens + registry + switcher); **Monokai-based dark** ships first (Shiki highlighting); **multiple themes later**; VS Code theme import in S9 | ✅ | v0.2-Q21, v0.3-Q19 | User: "later we will be able to choose multiple" |
 | D-092 | **Tech stack packs** (Kervan); first pack **`kervan-rust-tauri-react`** (dogfooding) | ✅ | v0.2-Q21, v0.3-Q17 | |
-| D-100 | Extension runtime: **backend = separate processes (JSON-RPC over stdio, any language); UI = sandboxed iframes with a message API** | ✅ | v0.3-Q4 (blank → ⭐⭐) | WASM option possible later |
+| D-100 | Extension runtime: **backend = separate processes (JSON-RPC over stdio, any language); UI = sandboxed iframes with a message API** | ✅ | v0.3-Q4 (blank → ⭐⭐) | v0.5: iframes get an **opaque origin**, proven by spike T-04 (Tauri advisory CVE-2024-35222); dedicated webviews revisited before S9: 🟡 v0.5-Q4 |
 | D-101 | **Bedesten** = GitHub registry repo (name → repo, versions, checksums) + install by git URL | ✅ | v0.3-Q5 | |
 | D-103 | Stack packs install tools with **`mise`** | ✅ | v0.3-Q18 | |
-| D-104 | **Git for this folder now**; later it becomes the Atabey monorepo with `brainstorm/` → `docs/brainstorm/` | ✅ | v0.3-Q25 | `git init -b main` done by the user 2026-10-09; first commit 2026-10-10; `outputs/` decision pending ([action](v0.4/07-ACTION-GIT-INIT.md)). Move timing: 🟡 v0.4-Q10 |
-| D-105 | **Ulak · Extension Messaging**: commands + events + typed, versioned services, all through the core broker; contracts generated from Rust types; S0 = commands + events; 1.0 in S9 | 🟡 | v0.3-Q27 → v0.4-Q7 | User's idea |
-| D-110 | **ACP-first agent connection from S2**: Claude Code via `claude-agent-acp` (user installs, signs in via Claude Code's own login); OpenCode via `opencode acp`; terminal layout via PTY + Claude hooks bridge + Atabey MCP server; OpenCode server API for headless batch jobs | 🟡 | v0.3-Q27 → v0.4-Q1, Q2 | Supersedes D-017 if accepted |
-| D-111 | **v1.0 = native GUI over ACP by default + Terminal layout fallback (one click), both built in S2**; v2.0 = more doc types, CD, public Talimhane, more agents | 🟡 | v0.3-Q27 → v0.4-Q1 | Supersedes D-018 if accepted. Claude's opinion: yes |
-| D-112 | Revised slice contents: S0 + theme system + Ulak v0; **S2 = ACP native + terminal fallback**; S5 = OpenCode headless; S7 apprentice via OpenCode/ACP; S9 + Ulak 1.0 + more themes | 🟡 | v0.4-Q1 | See [v0.4/02 §6](v0.4/02-PROPOSAL-AGENTS-AND-SESSIONS.md#6-revised-build-order) |
+| D-104 | **Git for this folder now**; later it becomes the Atabey monorepo with `brainstorm/` → `docs/brainstorm/` | ✅ | v0.3-Q25 | `git init -b main` done by the user 2026-10-09; first commit 2026-10-10. **Moved to `docs/brainstorm/` at the start of v0.5** (v0.4-Q10 ✅). `outputs/`: 🟡 v0.5-Q8. GitHub remote: 🟡 v0.5-Q6 |
+| D-105 | **Ulak · Extension Messaging**: commands + events + typed, versioned services, all through the core broker; contracts generated from Rust types; S0 = commands + events; 1.0 in S9 | ✅ | v0.3-Q27 → v0.4-Q7 | User's idea |
+| D-110 | **ACP-first agent connection from S2**: Claude Code via `claude-agent-acp` (user installs, signs in via Claude Code's own login); OpenCode via `opencode acp`; terminal layout via PTY + Claude hooks bridge + Atabey MCP server; OpenCode server API for headless batch jobs | ✅ | v0.3-Q27 → v0.4-Q1, Q2 | Supersedes D-017 |
+| D-111 | **v1.0 = native GUI over ACP by default + Terminal layout fallback (one click), both built in S2**; v2.0 = more doc types, CD, public Talimhane, more agents | ✅ | v0.3-Q27 → v0.4-Q1 | Supersedes D-018 |
+| D-112 | Revised slice contents: S0 + theme system + Ulak v0; **S2 = ACP native + terminal fallback**; S5 = OpenCode headless; S7 apprentice via OpenCode/ACP; S9 + Ulak 1.0 + more themes | ✅ | v0.4-Q1 | See [v0.4/02 §6](v0.4/02-PROPOSAL-AGENTS-AND-SESSIONS.md#6-revised-build-order) |
 | D-113 | **Main coding agent: Claude Code** (user's own subscription). OpenCode (OpenCode Go) = observers, judge, apprentice, second agent | ✅ | v0.3-Q27 | Second agent in S2: 🟡 v0.4-Q3 |
 
 ## Spec-Driven Development
@@ -90,9 +90,9 @@ updated-in-session: v0.4
 | D-049a | **Pipeline Recipes**: typed `pipeline.toml` + recipes from stack packs + local runner + generated GitHub Actions | ✅ | v0.2-Q21 → v0.3-Q10 | Dagger backend: maybe v2 |
 | D-049b | Static analysis: **Gitleaks + OSV-Scanner + Trivy + Opengrep + per-language linters → SARIF**, diff-aware gate, installed by stack packs | ✅ | v0.2-Q21 → v0.3-Q12 | No SonarQube |
 | D-102 | **CI only in v1**; deploy recipes via stack packs in v2 | ✅ | v0.3-Q9 | |
-| D-106 | **Observer runtime: OpenCode headless** with custom read-only agents (`edit`/`bash`/`webfetch` = deny), in a **separate git worktree** at the feature commit; JSON findings returned, engine writes them | 🟡 | v0.3-Q27 → v0.4-Q4 | User asked: OpenCode harness or new? → OpenCode |
-| D-107 | Claude subscription usage shown **separately as plan allowance**; $ caps apply only to pay-per-token calls | 🟡 | v0.4-Q5 | Which Claude plan: ❓ |
-| D-108 | Public-release rule: Atabey never ships its own "Sign in with Claude"; re-check Anthropic terms before any public release | 🟡 | v0.4-Q6 | |
+| D-106 | **Observer runtime: OpenCode headless** with custom read-only agents (`edit`/`bash`/`webfetch` = deny), in a **separate git worktree** at the feature commit; JSON findings returned, engine writes them | ✅ | v0.3-Q27 → v0.4-Q4 | User asked: OpenCode harness or new? → OpenCode |
+| D-107 | Claude subscription usage shown **separately as plan allowance**; $ caps apply only to pay-per-token calls | ✅ | v0.4-Q5 | Which Claude plan: ❓ v0.5-Q7 |
+| D-108 | Public-release rule: Atabey never ships its own "Sign in with Claude"; re-check Anthropic terms before any public release | ✅ | v0.4-Q6 | |
 
 ## Documentation & Codebase Atlas
 
@@ -137,4 +137,18 @@ updated-in-session: v0.4
 | D-080 | Extensions = **MCP server + skills + UI manifest**, own repos | ✅ | v0.1-Q28 | Refined by D-027, D-100, D-105 |
 | D-081 | **Brainstorm Studio** (Divan): versioned sessions, summaries, ledger, question forms; built in S3; **session folders + topic tags on decisions** (topic views computed in the app) | ✅ | v0.1-Q30, v0.2-Q14, v0.3-Q21 | |
 | D-082 | Brainstorm conversations stored as **versioned folders** | ✅ | v0.2 | |
-| D-083 | Brainstorming ends: **v0.4 consolidation → v0.5 detailed S0 technical spec & roadmap → build** | ✅ | v0.3-Q24 | |
+| D-083 | Brainstorming ends: **v0.4 consolidation → v0.5 detailed S0 technical spec & roadmap → build** | ✅ | v0.3-Q24 | **Brainstorming completed 2026-10-10** (v0.4 answers); v0.5 = S0 spec review |
+
+## Implementation (S0)
+
+| ID | Decision | Status | Source | Notes |
+|---|---|---|---|---|
+| D-120 | S0 spec: [specs/S0-foundations.md](../../specs/S0-foundations.md) (40 requirements, 22 ACs, 26 tasks) | 🟡 | v0.5-Q12 | Draft; frozen after v0.5 |
+| D-121 | Typed IPC via **tauri-specta** (exact pin `2.0.0-rc.25`), ts-rs fallback | 🟡 | v0.5-Q1 | |
+| D-122 | Markdown parsed **in Rust (comrak)** → typed AST → React | 🟡 | v0.5-Q2 | |
+| D-123 | Frontend: React 19 + TS 7 + Vite 8 + Tailwind 4 (tokens) + Radix + TanStack Router/Query + Zustand + Biome + pnpm | 🟡 | v0.5-Q3 | |
+| D-124 | First real extension: **Defter · Ledger Viewer** | 🟡 | v0.5-Q5 | |
+| D-125 | GitHub repo **public**, full macOS + Windows CI | 🟡 | v0.5-Q6 | Cost: $0 public vs ≈ $0–12 private |
+| D-126 | **One branch + PR per task**; CI green; user merges | 🟡 | v0.5-Q9 | |
+| D-127 | Tauri **2.12.x** (not 3.0 alpha); **gix** (not git2: license); **serde-saphyr** (serde_yaml deprecated); E2E via **WebdriverIO + @wdio/tauri-service**; gateway **OpenRouter only** in S0 | ✅ | v0.5 (spec §5.1, [02 §8](v0.5/02-S0-TECH-CHOICES.md#8-smaller-choices-already-made-in-the-spec)) | Follow from licenses and earlier decisions; object in v0.5-Q13 |
+

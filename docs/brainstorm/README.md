@@ -1,23 +1,24 @@
 # Atabey Brainstorm
 
 > Brainstorming history for **Atabey** *(the Seljuk guardian-tutor of princes; "Atelier" was dropped in v0.3)*: a Tauri desktop app that explains any codebase in a rich GUI and builds features through spec-driven, multi-agent development, with built-in mentorship and practice.
-> **Phase:** brainstorming, final round. No code yet.
+> **Phase:** brainstorming **complete** (2026-10-10). Now: **S0 spec review**, then implementation. No code yet.
 
 ## Where we are
 
 | | |
 |---|---|
-| **Current session** | [v0.4](v0.4/SUMMARY.md) (open): consolidation + native-first |
-| **Waiting on** | User's answers in [v0.4/06-OPEN-QUESTIONS.md](v0.4/06-OPEN-QUESTIONS.md) (last brainstorming round) |
+| **Current session** | [v0.5](v0.5/SUMMARY.md) (open): S0 spec review & freeze |
+| **Waiting on** | User's answers in [v0.5/03-OPEN-QUESTIONS.md](v0.5/03-OPEN-QUESTIONS.md) |
 | **All decisions** | [DECISIONS.md](DECISIONS.md) |
-| **Drafts to review** | [Product Spec](v0.4/04-PRODUCT-SPEC-DRAFT.md) · [Constitution](v0.4/05-CONSTITUTION-DRAFT.md) |
-| **Next planned** | v0.5 = **very detailed S0 Foundations technical spec & roadmap**, then implementation |
+| **Project documents** | [PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) (frozen) · [CONSTITUTION.md](../../CONSTITUTION.md) (frozen) · [S0 spec](../../specs/S0-foundations.md) (draft) · [ROADMAP.md](../../ROADMAP.md) · [PARKING-LOT.md](../../PARKING-LOT.md) |
+| **Next planned** | Freeze S0 → T-01 (workspace skeleton) |
 
 ## 📌 Action items for the user
 
 | Item | Status |
 |---|---|
-| Put this folder under git ([steps](v0.4/07-ACTION-GIT-INIT.md)): ✅ repo + first commit done; decide whether `outputs/` is versioned or ignored | 🔄 in progress |
+| Put this folder under git ([steps](v0.4/07-ACTION-GIT-INIT.md)) | ✅ done (`outputs/`: v0.5-Q8) |
+| Create the GitHub repo + push + $0 Actions budget ([steps](v0.5/04-ACTION-GITHUB-REPO.md)) | ⏳ after v0.5-Q6 |
 | Trademark/domain check of "Atabey" before going public | ⏳ later |
 | ~~Email roadmap.sh's founder~~ | ❌ cancelled (v0.3-Q27, D-114) |
 
@@ -28,7 +29,8 @@
 | [v0.1](v0.1/SUMMARY.md) | 2026-10-07 | Initial idea, first proposal, first question round | closed |
 | [v0.2](v0.2/SUMMARY.md) | 2026-10-07 | Answers processed, clarifications, priorities re-ordered, new pillars | closed |
 | [v0.3](v0.3/SUMMARY.md) | 2026-10-07 | New name, extensions, quality pipeline, decision models, Talimhane, build process | closed |
-| [v0.4](v0.4/SUMMARY.md) | 2026-10-09 | Claude Code first, native-first v1 over ACP, Ulak messaging, Product Spec + Constitution drafts | open |
+| [v0.4](v0.4/SUMMARY.md) | 2026-10-09 | Claude Code first, native-first v1 over ACP, Ulak messaging, Product Spec + Constitution drafts | closed |
+| [v0.5](v0.5/SUMMARY.md) | 2026-10-10 | Brainstorming ends; Product Spec + Constitution frozen; detailed S0 spec drafted | open |
 
 ## How this folder works
 

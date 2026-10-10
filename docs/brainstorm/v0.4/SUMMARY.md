@@ -1,7 +1,7 @@
 ---
 session: v0.4
 date: 2026-10-09
-status: open            # becomes "closed" when the user answers 06-OPEN-QUESTIONS.md and v0.5 starts
+status: closed
 title: Consolidation, Claude Code first, native-first v1 over ACP, Ulak messaging, Product Spec + Constitution drafts
 previous: ../v0.3/SUMMARY.md
 ---
@@ -17,7 +17,7 @@ previous: ../v0.3/SUMMARY.md
 | [03-PROPOSAL-ULAK-MESSAGING.md](03-PROPOSAL-ULAK-MESSAGING.md) | **Ulak · Extension Messaging**: commands, events, typed services through the core broker; contracts; real flow |
 | [04-PRODUCT-SPEC-DRAFT.md](04-PRODUCT-SPEC-DRAFT.md) | Consolidated **Product Spec** draft (vision → glossary) |
 | [05-CONSTITUTION-DRAFT.md](05-CONSTITUTION-DRAFT.md) | **Constitution** draft: 12 articles |
-| [06-OPEN-QUESTIONS.md](06-OPEN-QUESTIONS.md) | Round 4 (last): 10 questions + 2 free-text (**awaiting your answers**) |
+| [06-OPEN-QUESTIONS.md](06-OPEN-QUESTIONS.md) | Round 4 (last): 10 questions + 2 free-text (answered 2026-10-10) |
 | [07-ACTION-GIT-INIT.md](07-ACTION-GIT-INIT.md) | 📌 **User action**: `git init` (blocked by session permissions) |
 
 ## What happened
