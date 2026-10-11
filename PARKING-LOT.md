@@ -13,3 +13,4 @@ updated: 2026-10-10
 | P-002 | 2026-10-10 | Visual regression screenshots of the golden corpus on both OSes | S0 spec §7 | ⏳ next boundary |
 | P-003 | 2026-10-10 | Code signing, notarization (macOS) and installers + auto-update | S0 non-goals | ⏳ next boundary |
 | P-004 | 2026-10-11 | Real app icon (T-02 ships a placeholder monogram generated from `apps/desktop/src-tauri/icons/source.svg`) | S0 T-02 | ⏳ next boundary |
+| P-005 | 2026-10-12 | Serve the app and `atabey-ext` over `https://` on Windows (Tauri `use_https_scheme`) so extension iframes become a secure context (`crypto.subtle`, clipboard). It moves the main window's origin (web storage is lost), so decide before the first public release | ADR-0007 (T-04, Windows finding 5) | ⏳ next boundary |

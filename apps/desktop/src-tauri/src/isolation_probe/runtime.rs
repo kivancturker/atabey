@@ -271,7 +271,7 @@ fn on_page_load(webview: &Webview<Wry>, payload: &PageLoadPayload<'_>) {
 
 /// Experiment hooks, probe builds only: replace the extension page CSP or add an
 /// `Access-Control-Allow-Origin` header without recompiling, to find the minimal header set
-/// that lets an opaque-origin page load its own files (ADR-0007, possible amendment A-4).
+/// that lets an opaque-origin page load its own files (ADR-0007, amendment A-4).
 fn apply_experiment_headers(response: &mut tauri::http::Response<Cow<'static, [u8]>>) {
     use tauri::http::{HeaderValue, header};
     let headers = response.headers_mut();
@@ -309,8 +309,9 @@ fn probe_handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
 /// Registers the scheme, the probe commands and the observers on `builder`.
 ///
 /// `main_handler` keeps serving every command that is not a probe command, so the app behaves as
-/// usual. The frame-src of the runtime CSP is widened for both URL shapes under test; the
-/// committed `tauri.conf.json` is not touched (the selected shape is decided by ADR-0007).
+/// usual. The committed `tauri.conf.json` allows only the selected URL shape in `frame-src`
+/// (ADR-0007, amendment A-3); the probe widens the runtime CSP for the rejected `localhost` shape
+/// so that it stays measured.
 pub fn install<H>(
     builder: tauri::Builder<Wry>,
     context: &mut Context<Wry>,
@@ -319,17 +320,17 @@ pub fn install<H>(
 where
     H: Fn(Invoke<Wry>) -> bool + Send + Sync + 'static,
 {
-    let frame_src = format!(
-        "frame-src {s}: http://{s}.{l} http://{s}.{i}",
+    let observed_sources = format!(
+        "{s}://{l} http://{s}.{l}",
         s = ext_scheme::SCHEME,
         l = ext_scheme::LOCALHOST_HOST,
-        i = ext_scheme::ISOLATED_HOST,
     );
     let security = &mut context.config_mut().app.security;
     for csp in [&mut security.csp, &mut security.dev_csp] {
         if let Some(existing) = csp.as_ref() {
-            *csp = Some(tauri::utils::config::Csp::Policy(format!(
-                "{existing}; {frame_src}"
+            *csp = Some(tauri::utils::config::Csp::Policy(super::widen_frame_src(
+                &existing.to_string(),
+                &observed_sources,
             )));
         }
     }
@@ -344,7 +345,11 @@ where
     builder
         .manage(ProbeState::default())
         .register_uri_scheme_protocol(ext_scheme::SCHEME, |_ctx, request| {
-            let mut response = ext_scheme::respond(&EmbeddedUi, &request);
+            let mut response = ext_scheme::respond_on_hosts(
+                &EmbeddedUi,
+                &request,
+                &[ext_scheme::ISOLATED_HOST, ext_scheme::LOCALHOST_HOST],
+            );
             apply_experiment_headers(&mut response);
             eprintln!(
                 "probe: served {} {} -> {}",

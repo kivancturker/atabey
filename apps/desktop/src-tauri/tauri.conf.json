@@ -22,8 +22,8 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self' customprotocol: asset:; connect-src 'self' ipc: http://ipc.localhost",
-      "devCsp": "default-src 'self' customprotocol: asset: ; connect-src 'self' ipc: http://ipc.localhost ws://127.0.0.1:1420 http://127.0.0.1:1420 ; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self' customprotocol: asset:; connect-src 'self' ipc: http://ipc.localhost; frame-src atabey-ext://sandbox http://atabey-ext.sandbox",
+      "devCsp": "default-src 'self' customprotocol: asset: ; connect-src 'self' ipc: http://ipc.localhost ws://127.0.0.1:1420 http://127.0.0.1:1420 ; style-src 'self' 'unsafe-inline' ; frame-src atabey-ext://sandbox http://atabey-ext.sandbox"
     }
   },
   "bundle": {
