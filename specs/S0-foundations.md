@@ -609,7 +609,7 @@ flowchart LR
 
 | ID | Date | Change | Status |
 |---|---|---|---|
-| — | — | (none yet) | — |
+| A-1 | 2026-10-11 | §5.12 CSP row: main window CSP gains `connect-src 'self' ipc: http://ipc.localhost`. Without it, Tauri's IPC custom protocol is blocked in release builds and silently falls back to the slower postMessage bridge (Tauri CSP docs). No change to the rules (still no `unsafe-eval`) | 🟡 proposed (found in T-02 review); applied in `tauri.conf.json` on the T-02 branch pending your approval |
 
 ## 9. Sources
 
