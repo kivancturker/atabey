@@ -552,13 +552,20 @@ fn entropy(value: &str) -> f64 {
         .sum()
 }
 
-/// A bearer or basic token is redacted when it has digits or base64 punctuation, or is long;
-/// plain words (`Basic authentication required`) stay.
+/// A bearer or basic token is redacted unless it is a plain word: all letters, and either
+/// lowercase after the first character (`authentication`, `Authentication`) or all uppercase
+/// (`REQUIRED`). So `Basic authentication required` stays, while any token with a digit or
+/// punctuation, or mixed-case letters, is redacted.
 fn looks_like_token(token: &str) -> bool {
-    token.chars().count() >= 32
-        || token
-            .chars()
-            .any(|c| c.is_ascii_digit() || matches!(c, '+' | '/' | '=' | '~'))
+    let mut chars = token.chars();
+    let first = chars.next();
+    let rest: Vec<char> = chars.collect();
+    let all_letters =
+        first.is_some_and(char::is_alphabetic) && rest.iter().all(|c| c.is_alphabetic());
+    let plain_word = all_letters
+        && (rest.iter().all(|c| c.is_lowercase())
+            || first.is_some_and(char::is_uppercase) && rest.iter().all(|c| c.is_uppercase()));
+    !plain_word
 }
 
 struct Patterns {
@@ -588,7 +595,7 @@ impl Patterns {
             // name, separator, value. The value stops before the marker characters so a value
             // that was already redacted is never matched again.
             credential: Regex::new(
-                r#"(?i)[A-Za-z0-9_.\-]*(?:token|secret|key|password)[A-Za-z0-9_.\-]*(?:["']?\s*[=:]\s*["']?)([^\s"',;&)}\]«»]{16,})"#,
+                r#"(?i)[A-Za-z0-9_.\-]*(?:token|secret|key|password)[A-Za-z0-9_.\-]*(?:\\?["'])?\s*[=:]\s*(?:\\?["'])?([^\s"',;&)}\]«»\\]{16,})"#,
             )?,
         })
     }
@@ -765,8 +772,24 @@ mod tests {
         assert_eq!(out, "Authorization: Bearer «redacted:bearer_token»");
         let out = redactor.redact("authorization: basic dXNlcjpwYXNzd29yZA==");
         assert_eq!(out, "authorization: basic «redacted:bearer_token»");
+        let mixed: String = body(24, 12)
+            .chars()
+            .filter(char::is_ascii_alphabetic)
+            .collect();
+        assert!(
+            mixed.chars().any(|c| c.is_ascii_uppercase())
+                && mixed.chars().any(|c| c.is_ascii_lowercase())
+        );
+        let out = red(&redactor, &format!("Bearer {mixed}"));
+        assert_eq!(out, "Bearer «redacted:bearer_token»");
+        assert_eq!(
+            red(&redactor, "Bearer snake_case_token"),
+            "Bearer «redacted:bearer_token»"
+        );
         for harmless in [
             "Basic authentication required",
+            "Bearer Authentication",
+            "Basic REQUIRED",
             "token_type: bearer",
             "the bearer of this message",
         ] {
@@ -813,6 +836,24 @@ mod tests {
                 "{harmless}"
             );
         }
+    }
+
+    #[test]
+    fn credentials_in_once_escaped_json_are_redacted() {
+        let redactor = Redactor::new();
+        let value = body(32, 91);
+        let out = red(
+            &redactor,
+            &format!(
+                "body=\"{{\\\"client_secret\\\":\\\"{value}\\\",\\\"token_type\\\":\\\"bearer\\\"}}\""
+            ),
+        );
+        assert!(!out.contains(&value), "{out}");
+        assert!(out.contains("\\\"«redacted:credential»\\\""), "{out}");
+        assert!(out.contains("\\\"token_type\\\":\\\"bearer\\\""), "{out}");
+        assert_eq!(red(&redactor, &out), out);
+        let negative = "\\\"token_type\\\":\\\"bearer\\\"";
+        assert!(matches!(redactor.redact(negative), Cow::Borrowed(_)));
     }
 
     #[test]
