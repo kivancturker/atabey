@@ -1,7 +1,7 @@
 ---
 id: ADR-0010
 title: "Defter ledger: the time crate, UTC day folders, entry kinds and the clock seam"
-status: proposed
+status: accepted
 date: 2026-10-12
 decisions: [D-029]
 spec: specs/S0-foundations.md R-21, R-22, §5.4, §5.8 (T-05)
