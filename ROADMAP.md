@@ -28,7 +28,7 @@ source: PRODUCT-SPEC.md (v1.1.0) §4–5 · docs/brainstorm/DECISIONS.md D-025, 
 | Milestone | Tasks | Status |
 |---|---|---|
 | M1 Skeleton & CI | T-01 workspace skeleton · T-02 Tauri shell + CI · T-03 types + codegen · T-04 iframe spike | ✅ all merged (ADR-0007 accepted) |
-| M2 Core services | T-05 … T-10 | 🚧 T-05 in review (ADR-0010 accepted) |
+| M2 Core services | T-05 … T-10 | 🚧 T-05 merged (ADR-0010 accepted) · T-06 in review (ADR-0011 proposed) |
 | M3 Documents & themes | T-11 … T-17 | ⏳ |
 | M4 Budget & gateway | T-18, T-19 | ⏳ |
 | M5 Extensions & Ulak | T-20 … T-23 | ⏳ |

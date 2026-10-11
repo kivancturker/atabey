@@ -11,6 +11,7 @@ use uuid::Uuid;
 use crate::clock::Clock;
 use crate::entry::{EntryDraft, LedgerEntry};
 use crate::error::DefterError;
+use crate::redact::Redactor;
 
 /// The file currently open for appends, and the day it belongs to.
 #[derive(Debug)]
@@ -26,6 +27,7 @@ struct Inner {
     project: ProjectId,
     session: SessionId,
     clock: Arc<dyn Clock>,
+    redactor: Redactor,
     open: Mutex<Option<OpenDay>>,
 }
 
@@ -43,12 +45,17 @@ pub struct Ledger {
 impl Ledger {
     /// A ledger for one project and session. Nothing is created on disk until the first append.
     /// `root` is `~/.atabey/defter` in production and a temp dir in tests.
+    ///
+    /// Every entry is redacted with `redactor` before it is written (R-23). The argument is
+    /// required so a ledger can't be built without one; use [`Redactor::new`] when there are no
+    /// known secrets yet.
     #[must_use]
     pub fn new(
         root: impl Into<PathBuf>,
         project: ProjectId,
         session: SessionId,
         clock: Arc<dyn Clock>,
+        redactor: Redactor,
     ) -> Self {
         Self {
             inner: Arc::new(Inner {
@@ -56,6 +63,7 @@ impl Ledger {
                 project,
                 session,
                 clock,
+                redactor,
                 open: Mutex::new(None),
             }),
         }
@@ -114,9 +122,10 @@ impl Ledger {
 
     /// The single choke point every ledger write goes through.
     ///
-    /// T-06 (R-23) inserts the redactor here, on `entry`, before it is serialized, so no caller
-    /// has to change.
-    fn commit(&self, entry: LedgerEntry) -> Result<LedgerEntry, DefterError> {
+    /// The redactor (R-23) runs here, on `entry`, before it is serialized. The returned entry is
+    /// the redacted one, exactly as written.
+    fn commit(&self, mut entry: LedgerEntry) -> Result<LedgerEntry, DefterError> {
+        self.inner.redactor.redact_entry(&mut entry);
         let mut line = serde_json::to_vec(&entry)?;
         line.push(b'\n');
 

@@ -6,17 +6,22 @@
 //!   everything a user-initiated action causes, in the ledger and on `tracing` spans.
 //! * The **app log** is `tracing` output in daily rolling files (R-22). See [`init_app_log`].
 //!
-//! Timestamps and day folders are UTC (ADR-0010). Redaction (T-06) and retention (T-07) are not
-//! part of this crate yet.
+//! * The **redactor** ([`Redactor`]) replaces every secret in the keychain, and anything that
+//!   matches a secret pattern, with `«redacted:<kind>»` before a ledger entry, a log line or an
+//!   IPC error is written (R-23, ADR-0011).
+//!
+//! Timestamps and day folders are UTC (ADR-0010). Retention (T-07) is not part of this crate yet.
 
 mod applog;
 mod clock;
 mod entry;
 mod error;
 mod ledger;
+mod redact;
 
 pub use applog::{AppLog, LogFormat, app_log, init_app_log};
 pub use clock::{Clock, ManualClock, SystemClock};
 pub use entry::{Actor, EntryDraft, EntryKind, LedgerEntry, Outcome, Timestamp};
 pub use error::{DefterError, LogError};
 pub use ledger::{Flow, Ledger};
+pub use redact::{KnownSecret, RedactError, RedactionKind, Redactor};

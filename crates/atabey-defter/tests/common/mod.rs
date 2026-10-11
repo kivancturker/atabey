@@ -1,11 +1,14 @@
 //! Helpers shared by the integration tests.
 #![allow(dead_code)]
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, PoisonError};
 
-use atabey_defter::{Actor, EntryDraft, EntryKind, Ledger, LedgerEntry, ManualClock, Outcome};
+use atabey_defter::{
+    Actor, EntryDraft, EntryKind, KnownSecret, Ledger, LedgerEntry, ManualClock, Outcome, Redactor,
+};
 use atabey_types::{ExtensionId, ProjectId, ProviderId, SessionId};
 use serde_json::json;
 use time::OffsetDateTime;
@@ -30,7 +33,7 @@ pub fn clock_at(instant: OffsetDateTime) -> Arc<ManualClock> {
 }
 
 pub fn ledger_in(root: &Path, clock: Arc<ManualClock>) -> Ledger {
-    Ledger::new(root, project_id(), session_id(), clock)
+    Ledger::new(root, project_id(), session_id(), clock, Redactor::new())
 }
 
 pub const MORNING: OffsetDateTime = datetime!(2026-10-12 09:30:15.250 UTC);
@@ -97,4 +100,42 @@ pub fn read_entries(path: &PathBuf) -> Result<Vec<LedgerEntry>, Box<dyn std::err
     text.lines()
         .map(|line| Ok(serde_json::from_str(line)?))
         .collect()
+}
+
+/// Stands in for the keychain (T-08): stores secrets by name and pushes the whole set to the
+/// redactor after every change, the way `secret_set` and `secret_clear` will.
+#[derive(Debug)]
+pub struct KeychainMock {
+    secrets: Mutex<BTreeMap<String, String>>,
+    redactor: Redactor,
+}
+
+impl KeychainMock {
+    pub fn new() -> Self {
+        Self {
+            secrets: Mutex::new(BTreeMap::new()),
+            redactor: Redactor::new(),
+        }
+    }
+
+    /// The redactor to give to the ledger and the app log.
+    pub fn redactor(&self) -> Redactor {
+        self.redactor.clone()
+    }
+
+    pub fn set(&self, name: &str, value: &str) -> TestResult {
+        let mut secrets = self.secrets.lock().unwrap_or_else(PoisonError::into_inner);
+        secrets.insert(name.to_owned(), value.to_owned());
+        self.redactor
+            .set_known_secrets(secrets.values().cloned().map(KnownSecret::new))?;
+        Ok(())
+    }
+
+    pub fn clear(&self, name: &str) -> TestResult {
+        let mut secrets = self.secrets.lock().unwrap_or_else(PoisonError::into_inner);
+        secrets.remove(name);
+        self.redactor
+            .set_known_secrets(secrets.values().cloned().map(KnownSecret::new))?;
+        Ok(())
+    }
 }

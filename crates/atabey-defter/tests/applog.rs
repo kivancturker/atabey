@@ -4,7 +4,7 @@ mod common;
 
 use std::fs;
 
-use atabey_defter::{LogFormat, app_log, init_app_log};
+use atabey_defter::{LogFormat, Redactor, app_log, init_app_log};
 use common::*;
 use tracing_subscriber::EnvFilter;
 
@@ -40,7 +40,12 @@ fn read_log(dir: &std::path::Path) -> Result<String, Box<dyn std::error::Error>>
 fn text_log_lands_in_a_daily_named_file() -> TestResult {
     let dir = tempfile::tempdir()?;
     let logs = dir.path().join("logs"); // created on demand
-    let log = app_log(&logs, LogFormat::Text, EnvFilter::new("info"))?;
+    let log = app_log(
+        &logs,
+        LogFormat::Text,
+        EnvFilter::new("info"),
+        Redactor::new(),
+    )?;
 
     tracing::dispatcher::with_default(&log.dispatch, || {
         tracing::info!(project = "harness", "project opened");
@@ -56,7 +61,12 @@ fn text_log_lands_in_a_daily_named_file() -> TestResult {
 #[test]
 fn json_log_lines_parse() -> TestResult {
     let dir = tempfile::tempdir()?;
-    let log = app_log(dir.path(), LogFormat::Json, EnvFilter::new("info"))?;
+    let log = app_log(
+        dir.path(),
+        LogFormat::Json,
+        EnvFilter::new("info"),
+        Redactor::new(),
+    )?;
 
     tracing::dispatcher::with_default(&log.dispatch, || {
         tracing::warn!(provider = "openrouter", "budget cap reached");
@@ -80,7 +90,12 @@ fn log_lines_inside_a_flow_carry_the_ledger_correlation_id() -> TestResult {
     let ledger_root = tempfile::tempdir()?;
     let logs = tempfile::tempdir()?;
     let ledger = ledger_in(ledger_root.path(), clock_at(MORNING));
-    let log = app_log(logs.path(), LogFormat::Json, EnvFilter::new("info"))?;
+    let log = app_log(
+        logs.path(),
+        LogFormat::Json,
+        EnvFilter::new("info"),
+        Redactor::new(),
+    )?;
 
     // A span binds to the subscriber that is active when it is created, so the flow starts inside
     // `with_default` here. In the app the global subscriber is installed first.
@@ -106,10 +121,10 @@ fn log_lines_inside_a_flow_carry_the_ledger_correlation_id() -> TestResult {
 #[test]
 fn init_installs_the_global_subscriber_once() -> TestResult {
     let dir = tempfile::tempdir()?;
-    let guard = init_app_log(dir.path(), LogFormat::Text)?;
+    let guard = init_app_log(dir.path(), LogFormat::Text, Redactor::new())?;
     tracing::error!("global subscriber installed");
     // A second install is a typed error, not a panic.
-    let again = init_app_log(dir.path(), LogFormat::Text);
+    let again = init_app_log(dir.path(), LogFormat::Text, Redactor::new());
     assert!(matches!(
         again,
         Err(atabey_defter::LogError::AlreadyInstalled)
