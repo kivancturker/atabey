@@ -18,7 +18,7 @@
 | Item | Status |
 |---|---|
 | Put this folder under git ([steps](v0.4/07-ACTION-GIT-INIT.md)) | ✅ done (`outputs/`: v0.5-Q8) |
-| Create the **public** GitHub repo + push ([steps](v0.5/04-ACTION-GITHUB-REPO.md)) | ⏳ todo (needed for PRs + CI) |
+| Create the **public** GitHub repo + push ([steps](v0.5/04-ACTION-GITHUB-REPO.md)) | ✅ done ([kivancturker/atabey](https://github.com/kivancturker/atabey), CI on macOS + Windows) |
 | Trademark/domain check of "Atabey" before going public | ⏳ later |
 | ~~Email roadmap.sh's founder~~ | ❌ cancelled (v0.3-Q27, D-114) |
 

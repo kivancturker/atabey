@@ -9,6 +9,7 @@
 //! The host name is the security decision measured by the spike. Tauri classifies a frame by its
 //! URL, and on Windows a custom scheme is `http://<scheme>.<host>/`. A host that is not
 //! `localhost` makes that URL non-local, so Tauri denies app commands from it (ADR-0007).
+//! [`respond`] therefore serves [`ISOLATED_HOST`] only.
 
 use std::borrow::Cow;
 
@@ -24,7 +25,8 @@ pub const SCHEME: &str = "atabey-ext";
 /// `http://atabey-ext.localhost/` as a local (trusted) frame (ADR-0007, `is_local_url`).
 pub const ISOLATED_HOST: &str = "sandbox";
 
-/// The spec-literal host (`atabey-ext://localhost/…`). Only the spike uses it, to measure it.
+/// The host of the v0.5 design (`atabey-ext://localhost/…`), rejected by ADR-0007. [`respond`]
+/// refuses it; only the probe serves it (through [`respond_on_hosts`]) to keep measuring it.
 pub const LOCALHOST_HOST: &str = "localhost";
 
 /// What S0 spec §5.12 prescribes for extension pages. It does **not** work: in a sandboxed
@@ -41,7 +43,8 @@ pub const ALLOW_ORIGIN: &str = "null";
 /// The Content-Security-Policy of an extension page: its own folder and nothing else.
 ///
 /// Scoped to `<origin>/<extension id>/`, so a page can load its own files but not the main
-/// window's (`tauri://localhost`) and not another extension's (measured on macOS, ADR-0007).
+/// window's (`tauri://localhost`) and not another extension's (measured on macOS and Windows,
+/// ADR-0007).
 #[must_use]
 pub fn extension_csp(windows: bool, host: &str, extension: &ExtensionId) -> String {
     let origin = if windows {
@@ -184,11 +187,21 @@ fn refuse(status: StatusCode, reason: &'static str) -> Response<Cow<'static, [u8
 
 /// Answers one request: the file with its security headers, or an error status.
 ///
-/// 405 for anything but GET, 400 for a host that is not ours or a path that is not plain and
-/// relative, 404 for an unknown extension or file.
+/// 405 for anything but GET, 400 for a host other than [`ISOLATED_HOST`] or a path that is not
+/// plain and relative, 404 for an unknown extension or file.
 pub fn respond<A: UiAssets>(
     assets: &A,
     request: &Request<Vec<u8>>,
+) -> Response<Cow<'static, [u8]>> {
+    respond_on_hosts(assets, request, &[ISOLATED_HOST])
+}
+
+/// [`respond`] for an explicit list of hosts. The isolation probe passes [`LOCALHOST_HOST`] as
+/// well, so the rejected URL shape stays measured on every Tauri/wry upgrade (ADR-0007).
+pub fn respond_on_hosts<A: UiAssets>(
+    assets: &A,
+    request: &Request<Vec<u8>>,
+    hosts: &[&str],
 ) -> Response<Cow<'static, [u8]>> {
     if request.method() != Method::GET {
         let mut response = refuse(StatusCode::METHOD_NOT_ALLOWED, "method not allowed");
@@ -202,7 +215,7 @@ pub fn respond<A: UiAssets>(
         Err(_) => return refuse(StatusCode::BAD_REQUEST, "bad path"),
     };
     let host = request.uri().host().unwrap_or_default();
-    if host != ISOLATED_HOST && host != LOCALHOST_HOST {
+    if !hosts.contains(&host) {
         return refuse(StatusCode::BAD_REQUEST, "bad host");
     }
     match assets.get(&extension, &file) {
@@ -290,6 +303,29 @@ mod tests {
         ] {
             assert_eq!(get(uri).status(), StatusCode::BAD_REQUEST, "{uri}");
         }
+    }
+
+    /// ADR-0007 selected the `sandbox` host; the `localhost` shape is served to the probe only.
+    #[test]
+    fn the_rejected_localhost_host_is_served_only_on_request() {
+        let uri = "atabey-ext://localhost/atabey.defter-viewer/ui/index.html";
+        assert_eq!(get(uri).status(), StatusCode::BAD_REQUEST);
+
+        let request = Request::builder()
+            .method(Method::GET)
+            .uri(uri)
+            .body(Vec::new())
+            .expect("valid test request");
+        let response = respond_on_hosts(&Fixed, &request, &[ISOLATED_HOST, LOCALHOST_HOST]);
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            header_of(&response, &header::CONTENT_SECURITY_POLICY),
+            extension_csp(
+                cfg!(windows),
+                LOCALHOST_HOST,
+                &ExtensionId::from("atabey.defter-viewer")
+            )
+        );
     }
 
     #[test]
