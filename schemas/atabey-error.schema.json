@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AtabeyError",
+  "description": "Every error that crosses a boundary (Tauri IPC, Ulak).\n\nOn the wire it is one flat object: the `code` of its [`ErrorKind`], that kind's fields, and a\nhuman-readable `message` written once in Rust (R-5, amendment A-2), e.g.\n`{ \"code\": \"not_found\", \"what\": \"README.md\", \"message\": \"Not found: README.md\" }`.",
+  "type": "object",
+  "properties": {
+    "message": {
+      "description": "What went wrong, as text the GUI can show as is.",
+      "type": "string"
+    }
+  },
+  "oneOf": [
+    {
+      "description": "A file, project, theme or setting doesn't exist.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "const": "not_found"
+        },
+        "what": {
+          "description": "What was looked up, e.g. a project-relative path.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "what"
+      ]
+    },
+    {
+      "description": "The caller sent a value the core can't accept.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "const": "invalid_input"
+        },
+        "field": {
+          "description": "The input field, e.g. `path`.",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Why it was rejected.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "field",
+        "reason"
+      ]
+    },
+    {
+      "description": "An extension tried something its manifest doesn't allow.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "const": "permission_denied"
+        },
+        "extension": {
+          "description": "The extension that was refused.",
+          "$ref": "#/$defs/ExtensionId"
+        },
+        "needed": {
+          "description": "The permission it would need.",
+          "$ref": "#/$defs/Permission"
+        }
+      },
+      "required": [
+        "code",
+        "extension",
+        "needed"
+      ]
+    },
+    {
+      "description": "A model request is paused because it would exceed a budget cap (Constitution Art. 7).",
+      "type": "object",
+      "properties": {
+        "cap": {
+          "description": "The cap it would exceed.",
+          "$ref": "#/$defs/CapKind"
+        },
+        "code": {
+          "type": "string",
+          "const": "budget_paused"
+        },
+        "needed_usd": {
+          "description": "The amount in USD over the cap.",
+          "type": [
+            "string",
+            "number"
+          ],
+          "pattern": "^-?\\d+(\\.\\d+)?([eE]\\d+)?$"
+        },
+        "request": {
+          "description": "The paused request, resolved with `budget_resolve`.",
+          "$ref": "#/$defs/BudgetRequestId"
+        }
+      },
+      "required": [
+        "code",
+        "request",
+        "needed_usd",
+        "cap"
+      ]
+    },
+    {
+      "description": "A model provider returned an error.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "const": "provider"
+        },
+        "detail": {
+          "description": "The provider's error, with secrets already redacted.",
+          "type": "string"
+        },
+        "provider": {
+          "description": "The provider that failed.",
+          "$ref": "#/$defs/ProviderId"
+        },
+        "status": {
+          "description": "The HTTP status, if the request got a response.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "code",
+        "provider",
+        "detail"
+      ]
+    },
+    {
+      "description": "An operation took longer than allowed.",
+      "type": "object",
+      "properties": {
+        "after_ms": {
+          "description": "The limit that was hit, in milliseconds (`u32`: TypeScript numbers can't hold every `u64`).",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "code": {
+          "type": "string",
+          "const": "timeout"
+        }
+      },
+      "required": [
+        "code",
+        "after_ms"
+      ]
+    },
+    {
+      "description": "A bug or an unexpected failure. Full detail goes to Defter; only a short summary crosses\nthe boundary.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "const": "internal"
+        },
+        "summary": {
+          "description": "A short, GUI-safe summary.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "summary"
+      ]
+    }
+  ],
+  "required": [
+    "message"
+  ],
+  "$defs": {
+    "BudgetRequestId": {
+      "description": "Identifies one paused model request waiting for the user's budget decision.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "CapKind": {
+      "description": "Which spending cap a paused request would exceed (Constitution Art. 7).",
+      "oneOf": [
+        {
+          "description": "The per-day cap (resets at local midnight).",
+          "type": "string",
+          "const": "daily"
+        },
+        {
+          "description": "The per-calendar-month cap.",
+          "type": "string",
+          "const": "monthly"
+        }
+      ]
+    },
+    "ExtensionId": {
+      "description": "An extension's reverse-DNS id, e.g. `atabey.defter-viewer`.",
+      "type": "string"
+    },
+    "HostPattern": {
+      "description": "A host pattern for the network permission, e.g. `api.github.com` or `*.openrouter.ai`.",
+      "type": "string"
+    },
+    "PanelSlot": {
+      "description": "Where an extension UI panel may appear (R-34).",
+      "oneOf": [
+        {
+          "description": "A panel in the sidebar.",
+          "type": "string",
+          "const": "sidebar"
+        },
+        {
+          "description": "A view in the main area.",
+          "type": "string",
+          "const": "main_area"
+        }
+      ]
+    },
+    "Permission": {
+      "description": "Something an extension must declare in its manifest before the core allows it (R-33, R-34).",
+      "oneOf": [
+        {
+          "description": "Call a Ulak command, e.g. `defter.query`.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ulak_command"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "description": "Receive a Ulak event, e.g. `defter.appended`.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ulak_subscribe"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "description": "Publish a Ulak event.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ulak_emit"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "description": "Contribute a UI panel to a slot.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ui_panel"
+            },
+            "value": {
+              "$ref": "#/$defs/PanelSlot"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "description": "Read files inside the open project.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "read_project_files"
+            }
+          },
+          "required": [
+            "kind"
+          ]
+        },
+        {
+          "description": "Make network requests to matching hosts.",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "network"
+            },
+            "value": {
+              "$ref": "#/$defs/HostPattern"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        }
+      ]
+    },
+    "ProviderId": {
+      "description": "A model provider's id, e.g. `openrouter`.",
+      "type": "string"
+    }
+  }
+}

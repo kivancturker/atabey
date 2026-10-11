@@ -1,7 +1,7 @@
 ---
 doc: decision-ledger
 updated: 2026-10-10
-updated-in-session: v0.5
+updated-in-session: v0.5 (closed)
 ---
 
 # Decision Ledger
@@ -24,7 +24,7 @@ updated-in-session: v0.5
 | D-006 | Name: **Atabey** (Seljuk guardian-tutor of princes) | ✅ | v0.2-Q1 → v0.3-Q1 | Trademark/domain check before going public |
 | D-007 | License **Apache-2.0** | ✅ | v0.2-Q19 | Talimhane scenario content: CC BY 4.0 (D-069) |
 | D-008 | Themed module names **always with a plain-English subtitle** (Orhun, Kurultay, Divan, Tuğra, Defter, Enderun, Talimhane, Bedesten, Kervan, Ulak) | ✅ | v0.3-Q2 | Ulak added in v0.4 |
-| D-109 | **[PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) and [CONSTITUTION.md](../../CONSTITUTION.md) v1.0.0 frozen** at the repo root | ✅ | v0.4-Q8, Q9 | Amendments A-1 proposed for each: 🟡 v0.5-Q10, Q11 |
+| D-109 | **[PRODUCT-SPEC.md](../../PRODUCT-SPEC.md) and [CONSTITUTION.md](../../CONSTITUTION.md) v1.0.0 frozen** at the repo root | ✅ | v0.4-Q8, Q9 | A-1 approved for both (v0.5-Q10, Q11) → **v1.1.0** |
 
 ## Platform & Architecture
 
@@ -53,10 +53,10 @@ updated-in-session: v0.5
 | D-090 | Code intelligence: **tree-sitter (always) + live LSP + SCIP snapshots at feature/phase end**; own cache keyed by content hash + commit | ✅ | v0.3-Q6 | |
 | D-091 | **Theme system from S0** (semantic tokens + registry + switcher); **Monokai-based dark** ships first (Shiki highlighting); **multiple themes later**; VS Code theme import in S9 | ✅ | v0.2-Q21, v0.3-Q19 | User: "later we will be able to choose multiple" |
 | D-092 | **Tech stack packs** (Kervan); first pack **`kervan-rust-tauri-react`** (dogfooding) | ✅ | v0.2-Q21, v0.3-Q17 | |
-| D-100 | Extension runtime: **backend = separate processes (JSON-RPC over stdio, any language); UI = sandboxed iframes with a message API** | ✅ | v0.3-Q4 (blank → ⭐⭐) | v0.5: iframes get an **opaque origin**, proven by spike T-04 (Tauri advisory CVE-2024-35222); dedicated webviews revisited before S9: 🟡 v0.5-Q4 |
+| D-100 | Extension runtime: **backend = separate processes (JSON-RPC over stdio, any language); UI = sandboxed iframes with a message API** | ✅ | v0.3-Q4 (blank → ⭐⭐) | v0.5: iframes get an **opaque origin**, proven by spike T-04 (Tauri advisory CVE-2024-35222); dedicated webviews revisited before S9 (v0.5-Q4 ✅) |
 | D-101 | **Bedesten** = GitHub registry repo (name → repo, versions, checksums) + install by git URL | ✅ | v0.3-Q5 | |
 | D-103 | Stack packs install tools with **`mise`** | ✅ | v0.3-Q18 | |
-| D-104 | **Git for this folder now**; later it becomes the Atabey monorepo with `brainstorm/` → `docs/brainstorm/` | ✅ | v0.3-Q25 | `git init -b main` done by the user 2026-10-09; first commit 2026-10-10. **Moved to `docs/brainstorm/` at the start of v0.5** (v0.4-Q10 ✅). `outputs/`: 🟡 v0.5-Q8. GitHub remote: 🟡 v0.5-Q6 |
+| D-104 | **Git for this folder now**; later it becomes the Atabey monorepo with `brainstorm/` → `docs/brainstorm/` | ✅ | v0.3-Q25 | `git init -b main` done by the user 2026-10-09; first commit 2026-10-10. **Moved to `docs/brainstorm/` at the start of v0.5** (v0.4-Q10 ✅). `outputs/` ignored (v0.5-Q8). GitHub remote: public (D-125), pending user action |
 | D-105 | **Ulak · Extension Messaging**: commands + events + typed, versioned services, all through the core broker; contracts generated from Rust types; S0 = commands + events; 1.0 in S9 | ✅ | v0.3-Q27 → v0.4-Q7 | User's idea |
 | D-110 | **ACP-first agent connection from S2**: Claude Code via `claude-agent-acp` (user installs, signs in via Claude Code's own login); OpenCode via `opencode acp`; terminal layout via PTY + Claude hooks bridge + Atabey MCP server; OpenCode server API for headless batch jobs | ✅ | v0.3-Q27 → v0.4-Q1, Q2 | Supersedes D-017 |
 | D-111 | **v1.0 = native GUI over ACP by default + Terminal layout fallback (one click), both built in S2**; v2.0 = more doc types, CD, public Talimhane, more agents | ✅ | v0.3-Q27 → v0.4-Q1 | Supersedes D-018 |
@@ -91,7 +91,7 @@ updated-in-session: v0.5
 | D-049b | Static analysis: **Gitleaks + OSV-Scanner + Trivy + Opengrep + per-language linters → SARIF**, diff-aware gate, installed by stack packs | ✅ | v0.2-Q21 → v0.3-Q12 | No SonarQube |
 | D-102 | **CI only in v1**; deploy recipes via stack packs in v2 | ✅ | v0.3-Q9 | |
 | D-106 | **Observer runtime: OpenCode headless** with custom read-only agents (`edit`/`bash`/`webfetch` = deny), in a **separate git worktree** at the feature commit; JSON findings returned, engine writes them | ✅ | v0.3-Q27 → v0.4-Q4 | User asked: OpenCode harness or new? → OpenCode |
-| D-107 | Claude subscription usage shown **separately as plan allowance**; $ caps apply only to pay-per-token calls | ✅ | v0.4-Q5 | Which Claude plan: ❓ v0.5-Q7 |
+| D-107 | Claude subscription usage shown **separately as plan allowance**; $ caps apply only to pay-per-token calls | ✅ | v0.4-Q5 | Claude plan: **Pro** (v0.5-Q7) |
 | D-108 | Public-release rule: Atabey never ships its own "Sign in with Claude"; re-check Anthropic terms before any public release | ✅ | v0.4-Q6 | |
 
 ## Documentation & Codebase Atlas
@@ -143,12 +143,12 @@ updated-in-session: v0.5
 
 | ID | Decision | Status | Source | Notes |
 |---|---|---|---|---|
-| D-120 | S0 spec: [specs/S0-foundations.md](../../specs/S0-foundations.md) (40 requirements, 22 ACs, 26 tasks) | 🟡 | v0.5-Q12 | Draft; frozen after v0.5 |
-| D-121 | Typed IPC via **tauri-specta** (exact pin `2.0.0-rc.25`), ts-rs fallback | 🟡 | v0.5-Q1 | |
-| D-122 | Markdown parsed **in Rust (comrak)** → typed AST → React | 🟡 | v0.5-Q2 | |
-| D-123 | Frontend: React 19 + TS 7 + Vite 8 + Tailwind 4 (tokens) + Radix + TanStack Router/Query + Zustand + Biome + pnpm | 🟡 | v0.5-Q3 | |
-| D-124 | First real extension: **Defter · Ledger Viewer** | 🟡 | v0.5-Q5 | |
-| D-125 | GitHub repo **public**, full macOS + Windows CI | 🟡 | v0.5-Q6 | Cost: $0 public vs ≈ $0–12 private |
-| D-126 | **One branch + PR per task**; CI green; user merges | 🟡 | v0.5-Q9 | |
+| D-120 | S0 spec: [specs/S0-foundations.md](../../specs/S0-foundations.md) (40 requirements, 22 ACs, 26 tasks) | ✅ | v0.5-Q12 | **Frozen v1.0.0 (2026-10-10)** |
+| D-121 | Typed IPC via **tauri-specta** (exact pin `2.0.0-rc.25`), ts-rs fallback | ✅ | v0.5-Q1 | |
+| D-122 | Markdown parsed **in Rust (comrak)** → typed AST → React | ✅ | v0.5-Q2 | |
+| D-123 | Frontend: React 19 + TS 7 + Vite 8 + Tailwind 4 (tokens) + Radix + TanStack Router/Query + Zustand + Biome + pnpm | ✅ | v0.5-Q3 | |
+| D-124 | First real extension: **Defter · Ledger Viewer** | ✅ | v0.5-Q5 | |
+| D-125 | GitHub repo **public**, full macOS + Windows CI | ✅ | v0.5-Q6 | $0 CI; repo creation is a user action |
+| D-126 | **One branch + PR per task**; CI green; user merges | ✅ | v0.5-Q9 | |
 | D-127 | Tauri **2.12.x** (not 3.0 alpha); **gix** (not git2: license); **serde-saphyr** (serde_yaml deprecated); E2E via **WebdriverIO + @wdio/tauri-service**; gateway **OpenRouter only** in S0 | ✅ | v0.5 (spec §5.1, [02 §8](v0.5/02-S0-TECH-CHOICES.md#8-smaller-choices-already-made-in-the-spec)) | Follow from licenses and earlier decisions; object in v0.5-Q13 |
 

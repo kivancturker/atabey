@@ -1,0 +1,11 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "cap": "daily",
+  "code": "budget_paused",
+  "message": "Paused: this request needs $0.42 more than the daily budget allows",
+  "needed_usd": "0.42",
+  "request": "01920f4e-7b3a-7c41-9d2e-5a8b6c3d1e0f"
+}

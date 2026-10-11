@@ -1,7 +1,7 @@
 ---
 session: v0.5
 date: 2026-10-10
-status: open            # becomes "closed" when the user answers 03-OPEN-QUESTIONS.md and the S0 spec is frozen
+status: closed
 title: Brainstorming ends; Product Spec + Constitution frozen; detailed S0 Foundations spec drafted
 previous: ../v0.4/SUMMARY.md
 ---
@@ -14,7 +14,7 @@ previous: ../v0.4/SUMMARY.md
 |---|---|
 | [01-CLARIFICATIONS.md](01-CLARIFICATIONS.md) | What was applied from v0.4 · missing Claude plan · **three findings**: iframe security (D-100), OpenCode Go only via OpenCode, missing licenses in Art. 10 · how freezing works |
 | [02-S0-TECH-CHOICES.md](02-S0-TECH-CHOICES.md) | Open technical choices compared with other tools: typed IPC, Markdown parsing, frontend stack, extension isolation, first extension, **repo visibility & CI cost**, task workflow |
-| [03-OPEN-QUESTIONS.md](03-OPEN-QUESTIONS.md) | Round 5: 12 questions + 2 free-text → **S0 freeze** |
+| [03-OPEN-QUESTIONS.md](03-OPEN-QUESTIONS.md) | Round 5: 12 questions + 2 free-text → **S0 freeze** (answered 2026-10-10) |
 | [04-ACTION-GITHUB-REPO.md](04-ACTION-GITHUB-REPO.md) | 📌 **User action**: create the GitHub repo, push, set a $0 Actions budget |
 
 **New at the repo root** (outside this folder, because they're living project documents):

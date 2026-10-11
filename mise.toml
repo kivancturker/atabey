@@ -1,0 +1,69 @@
+# Toolchain pins (D-103, ADR-0006). Rust is pinned in rust-toolchain.toml.
+# Setup: `mise install`, then `pnpm install`. Everyday gate: `mise run check`.
+
+[tools]
+node = "24.21.0"                                  # Active LTS
+pnpm = "12.10.1"
+cargo-deny = "0.20.2"                             # licenses + advisories (Constitution Art. 10)
+gitleaks = "8.30.1"                               # secret scan (Constitution Art. 5)
+"aqua:nextest-rs/nextest/cargo-nextest" = "0.9.148"
+cargo-insta = "1.49.0"                            # snapshot review (S0 T-11+)
+actionlint = "1.7.12"                             # validates .github/workflows locally (no remote yet)
+
+[tasks.fmt]
+description = "Format Rust and TypeScript/JSON"
+run = ["cargo fmt --all", "pnpm exec biome format --write ."]
+
+[tasks.web]
+description = "Build the frontend (Tauri crates need apps/desktop/dist to compile)"
+run = "pnpm --filter @atabey/desktop build"
+
+[tasks.lint]
+depends = ["web"]
+description = "Formatting check, clippy, Biome, TypeScript type-check, workflow lint"
+run = [
+  "cargo fmt --all --check",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo clippy -p atabey-desktop --all-targets --features isolation-probe -- -D warnings",
+  "pnpm exec biome check .",
+  "pnpm -r --if-present typecheck",
+  "actionlint",
+]
+
+[tasks.probe]
+depends = ["web"]
+description = "Extension iframe isolation probe (T-04, ADR-0007): opens a window, exits 0 when isolated"
+run = "cargo run -p atabey-desktop --features isolation-probe,tauri/custom-protocol -- --isolation-probe"
+
+[tasks.deny]
+description = "License and advisory policy (deny.toml)"
+run = "cargo deny check"
+
+[tasks.secrets]
+description = "Scan git history for secrets"
+run = "gitleaks git --no-banner --redact"
+
+[tasks.test]
+depends = ["web"]
+description = "Rust and TypeScript tests"
+run = [
+  "cargo nextest run --workspace --no-tests=pass",
+  "pnpm -r --if-present test",
+]
+
+[tasks.gen]
+depends = ["web"]
+description = "Regenerate TypeScript bindings and JSON Schemas from Rust types (ADR-0009)"
+run = "pnpm gen"
+
+[tasks.drift]
+depends = ["gen"]
+description = "Fail if the committed bindings or schemas differ from what the Rust types generate"
+run = [
+  "git diff --exit-code -- packages/bindings schemas",
+  "test -z \"$(git ls-files --others --exclude-standard -- packages/bindings schemas)\" || { echo 'Generated files are not committed:'; git ls-files --others --exclude-standard -- packages/bindings schemas; exit 1; }",
+]
+
+[tasks.check]
+description = "Everything CI runs, locally"
+depends = ["lint", "deny", "secrets", "test", "drift"]

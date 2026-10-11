@@ -1,0 +1,7 @@
+# Normalize line endings so snapshots and golden-corpus tests match on macOS and Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.woff2 binary

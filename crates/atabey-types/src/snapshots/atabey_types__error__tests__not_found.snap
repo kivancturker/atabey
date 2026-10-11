@@ -1,0 +1,9 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "code": "not_found",
+  "message": "Not found: docs/brainstorm/README.md",
+  "what": "docs/brainstorm/README.md"
+}

@@ -1,0 +1,32 @@
+[package]
+name = "atabey-desktop"
+description = "Atabey desktop shell: Tauri window, commands and events glue"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+name = "atabey_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+atabey-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
+tauri = { workspace = true, features = ["specta"] }
+tauri-specta.workspace = true
+
+[features]
+# T-04 isolation probe (ADR-0007). Never enabled in release builds.
+isolation-probe = []
+
+[lints]
+workspace = true

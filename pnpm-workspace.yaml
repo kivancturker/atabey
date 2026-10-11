@@ -1,0 +1,5 @@
+# Workspaces appear as their first package is created (T-02 apps, T-03+ packages, T-23 extension UI).
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "extensions/*/ui"

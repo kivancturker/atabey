@@ -1,3 +1,26 @@
 # macOS
 .DS_Store
+
+# Not part of Atabey (v0.5-Q8)
 /outputs
+
+# Rust
+/target/
+
+# Node / frontend
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Tauri
+apps/*/src-tauri/gen/schemas/
+
+# Logs and local env (secrets live in the OS keychain, never in files: Constitution Art. 5)
+*.log
+.env
+.env.*
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,9 +1,9 @@
 ---
 doc: constitution
 status: frozen
-version: 1.0.0
+version: 1.1.0
 frozen: 2026-10-10
-approved-in: v0.4-Q9 (accepted as drafted)
+approved-in: v0.4-Q9 (accepted as drafted); A-1 approved v0.5-Q11
 ---
 
 # Atabey Constitution
@@ -24,7 +24,7 @@ approved-in: v0.4-Q9 (accepted as drafted)
 | 7 | **Budget is a hard limit** | Every pay-per-token call goes through the LLM gateway and its caps ($1/day, $15/month by default; pause and ask at the cap). No direct provider calls that bypass the meter | D-044, D-047 |
 | 8 | **Least privilege** | Observers are structurally read-only. Extensions get only the permissions they declare and you approve. The decision gate **fails closed** (asks you) when unavailable. PoC tests run in containers | D-021, D-045, D-028 |
 | 9 | **One public API** | First-party features use the same extension API and Ulak contracts as community extensions. No private back doors into the core | D-027 |
-| 10 | **Licenses** | Linked/bundled dependencies: **MIT, Apache-2.0, BSD-2/3, ISC, Zlib, Unicode, MPL-2.0**. **LGPL** only as a separate executable (e.g., Opengrep). **GPL, AGPL, SSPL, BUSL, source-available**: never linked or bundled; at most an external tool you install yourself. Enforced in CI (`cargo-deny` + an npm license checker) | D-007 (Apache-2.0) |
+| 10 | **Licenses** | Linked/bundled dependencies: **MIT, Apache-2.0, BSD-2/3, ISC, Zlib, Unicode, MPL-2.0, CC0-1.0, 0BSD, BSL-1.0 (Boost)**. BSL-1.0 (Boost) is allowed; **BUSL (Business Source License) is not** *(A-1)*. **LGPL** only as a separate executable (e.g., Opengrep). **GPL, AGPL, SSPL, BUSL, source-available**: never linked or bundled; at most an external tool you install yourself. Enforced in CI (`cargo-deny` + an npm license checker) | D-007 (Apache-2.0) |
 | 11 | **Rich and real** | User-facing content is rendered richly (no raw Markdown, **no ASCII diagrams**). Examples, fixtures and lessons are **production-grade**, never toy (`Foo`/`Bar`, `Animal`/`Dog`) | D-022, D-068 |
 | 12 | **Amendments** | Any change to this constitution or a frozen spec: a written **delta** (what, why, impact) → you approve → version bump → logged in the ledger | D-030, D-034 (OpenSpec-style deltas) |
 
@@ -46,5 +46,5 @@ flowchart LR
 
 | ID | Date | Change (delta) | Why | Status |
 |---|---|---|---|---|
-| A-1 | 2026-10-10 | Article 10, allowed list: **+ CC0-1.0, 0BSD, BSL-1.0 (Boost)**. Add the note: *"BSL-1.0 (Boost) is allowed; BUSL (Business Source License) is not."* | `notify` (the standard Rust file watcher, needed in S0) is CC0-1.0; several core Rust crates are dual-licensed with BSL-1.0. All three are *more* permissive than MIT | 🟡 proposed: v0.5-Q11 |
+| A-1 | 2026-10-10 | Article 10, allowed list: **+ CC0-1.0, 0BSD, BSL-1.0 (Boost)**. Add the note: *"BSL-1.0 (Boost) is allowed; BUSL (Business Source License) is not."* | `notify` (the standard Rust file watcher, needed in S0) is CC0-1.0; several core Rust crates are dual-licensed with BSL-1.0. All three are *more* permissive than MIT | ✅ approved (v0.5-Q11) → v1.1.0 |
 

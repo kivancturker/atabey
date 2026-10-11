@@ -1,0 +1,13 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "code": "permission_denied",
+  "extension": "atabey.defter-viewer",
+  "message": "Extension atabey.defter-viewer needs the permission ui.panel:main_area",
+  "needed": {
+    "kind": "ui_panel",
+    "value": "main_area"
+  }
+}

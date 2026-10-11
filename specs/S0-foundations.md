@@ -1,11 +1,13 @@
 ---
 id: S0
 title: Foundations
-status: draft            # → frozen after v0.5 answers (Tuğra)
-version: 0.1.0
+status: frozen
+version: 1.0.2
+frozen: 2026-10-10
+approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1, A-2 approved 2026-10-11
 depends_on: []
-product-spec: ../PRODUCT-SPEC.md (v1.0.0)
-constitution: ../CONSTITUTION.md (v1.0.0)
+product-spec: ../PRODUCT-SPEC.md (v1.1.0)
+constitution: ../CONSTITUTION.md (v1.1.0)
 drafted-in: docs/brainstorm/v0.5
 date: 2026-10-10
 ---
@@ -114,7 +116,7 @@ Each requirement is testable. `→` lists the decisions it implements.
 | R-27 | **Secrets** (API keys) are stored only in the OS keychain (macOS Keychain, Windows Credential Manager), never in files, logs or IPC payloads back to the GUI (the GUI only sees "set / not set") |
 | R-28 | **Providers:** S0 supports **OpenRouter** (OpenAI-compatible) as the gateway provider. "Test connection" makes one minimal, metered call. The provider list is a Rust enum, ready for more |
 | R-29 | **Budget meter:** every pay-per-token call is estimated before it's sent and recorded after. Defaults **$1/day, $15/month**, adjustable. If a call would exceed a cap, it is **paused** and a dialog asks: *allow once / raise cap / cancel* → D-044, D-047, Constitution Art. 7 |
-| R-30 | The status bar shows today's spend / daily cap and month / monthly cap. A **Subscriptions** section in Settings records plans (e.g., "Claude: Max 5x", "OpenCode Go"); usage tracking comes in S2 → D-107 |
+| R-30 | The status bar shows today's spend / daily cap and month / monthly cap. A **Subscriptions** section in Settings records plans (yours: "Claude: Pro", "OpenCode Go"); usage tracking comes in S2 → D-107 |
 | R-31 | The LLM gateway is the **only** code that may make HTTP calls to model providers. A CI check rejects provider hostnames anywhere else |
 
 ### 3.8 Extension host & Ulak v0
@@ -175,14 +177,14 @@ Each requirement is testable. `→` lists the decisions it implements.
 |---|---|---|---|---|
 | Shell | **Tauri** | 2.12.x (not 3.0 alpha) | MIT/Apache-2.0 | D-011; v3 is alpha |
 | Async | tokio | 1.53 | MIT | Standard |
-| IPC types | **tauri-specta** + specta | `=2.0.0-rc.25` (pinned) | MIT | Typed commands **and** events; 🟡 v0.5-Q1 |
+| IPC types | **tauri-specta** + specta | `=2.0.0-rc.25` (pinned) | MIT | Typed commands **and** events (v0.5-Q1) |
 | JSON Schema | schemars | 1.2 | MIT | Contracts, block & theme schemas |
 | Schema validation | jsonschema | 0.58 | MIT | Ulak + typed blocks |
-| Markdown | **comrak** | 0.56 | BSD-2-Clause | GFM + frontmatter in Rust; 🟡 v0.5-Q2 |
+| Markdown | **comrak** | 0.56 | BSD-2-Clause | GFM + frontmatter in Rust (v0.5-Q2) |
 | YAML (frontmatter) | serde-saphyr | 1.3 | MIT/Apache-2.0 | `serde_yaml` is deprecated |
 | TOML | toml | 1.1 | MIT/Apache-2.0 | Settings, manifests |
 | Git (read-only) | **gix** | 0.89 | MIT/Apache-2.0 | Pure Rust; `git2` wraps libgit2 (GPL-2.0 + linking exception, not on the allowed list) |
-| File watching | notify (+ debouncer) | 8.2 | CC0-1.0 | Needs Constitution A-1 |
+| File watching | notify (+ debouncer) | 8.2 | CC0-1.0 | Allowed by Constitution A-1 |
 | SQLite (derived index) | rusqlite (`bundled`) | 0.40 | MIT | Index rebuilt from files on schema-version change; no migrations needed |
 | Secrets | keyring | 4.2 | MIT/Apache-2.0 | macOS Keychain, Windows Credential Manager |
 | Logging | tracing + tracing-subscriber + tracing-appender | 0.1 / 0.3 / 0.2 | MIT | Standard |
@@ -194,7 +196,7 @@ Each requirement is testable. `→` lists the decisions it implements.
 | Build | Vite | 8.3 | MIT | Tauri default |
 | Routing / data | TanStack Router + TanStack Query | 1.170 / 5.104 | MIT | Typed routes; IPC calls as cached queries |
 | UI state | Zustand | 5.0 | MIT | Small, simple |
-| Styling | Tailwind CSS mapped to semantic tokens + Radix primitives | 4.3 | MIT | 🟡 v0.5-Q3 |
+| Styling | Tailwind CSS mapped to semantic tokens + Radix primitives | 4.3 | MIT | v0.5-Q3 |
 | Diagrams / code | Mermaid / Shiki | 12.1 / 4.5 | MIT | R-11, R-12 |
 | Lint/format (TS) | Biome | 2.5 | MIT/Apache-2.0 | One fast tool |
 | TS tests | Vitest + Testing Library | 5.0 | MIT | |
@@ -272,17 +274,27 @@ pub struct ProjectId(pub Uuid);          // UUIDv7, stored in .atabey/project.to
 pub struct CorrelationId(pub Uuid);      // one per user-initiated flow
 pub struct ExtensionId(pub String);      // "atabey.defter-viewer"
 
-#[derive(Serialize, Deserialize, specta::Type, JsonSchema, thiserror::Error, Debug)]
+// A-2: wire form { code, ...fields, message }, e.g. { "code": "not_found", "what": "README.md", "message": "Not found: README.md" }
+#[derive(Serialize, Deserialize, specta::Type, JsonSchema, Debug)]
+pub struct AtabeyError {
+    #[serde(flatten)] pub kind: ErrorKind,
+    pub message: String,                 // ErrorKind's Display, written once in Rust
+}
+pub type IpcResult<T> = Result<T, AtabeyError>;  // every Tauri command returns this
+
+#[derive(Serialize, Deserialize, specta::Type, JsonSchema, Debug)]
 #[serde(tag = "code", rename_all = "snake_case")]
-pub enum AtabeyError {
+pub enum ErrorKind {                     // fields never named `code` or `message`
     NotFound { what: String },
     InvalidInput { field: String, reason: String },
     PermissionDenied { extension: ExtensionId, needed: Permission },
     BudgetPaused { request: BudgetRequestId, needed_usd: Decimal, cap: CapKind },
-    Provider { provider: ProviderId, status: Option<u16>, message: String },
-    Timeout { after_ms: u64 },
-    Internal { message: String },        // logged with full detail in Defter, short text to GUI
+    Provider { provider: ProviderId, status: Option<u16>, detail: String },
+    Timeout { after_ms: u32 },           // TS numbers can't hold every u64
+    Internal { summary: String },        // logged with full detail in Defter, short text to GUI
 }
+// Also in atabey-types (A-2), because AtabeyError needs them: CapKind, Permission, PanelSlot,
+// HostPattern, BudgetRequestId, ProviderId
 
 // atabey-docs
 pub struct Document { pub path: RelPath, pub frontmatter: Option<Frontmatter>, pub blocks: Vec<Block> }
@@ -311,10 +323,10 @@ pub enum Actor { User, Core, Extension(ExtensionId), Agent(String), Provider(Pro
 
 // atabey-llm
 pub struct Money(Decimal);               // USD, never f64
-pub enum CapKind { Daily, Monthly }
+pub enum CapKind { Daily, Monthly }   // defined in atabey-types (A-2)
 pub struct BudgetState { pub today: Money, pub month: Money, pub daily_cap: Money, pub monthly_cap: Money }
 
-// atabey-ext-host
+// atabey-ext-host (Permission itself is defined in atabey-types, A-2)
 pub enum Permission { UlakCommand(String), UlakSubscribe(String), UlakEmit(String),
     UiPanel(PanelSlot), ReadProjectFiles, Network(HostPattern) }
 ```
@@ -479,14 +491,14 @@ flowchart LR
   L --> LB
 ```
 
-Caching: `Swatinem/rust-cache`, pnpm store cache. Matrix trigger policy depends on repo visibility (🟡 v0.5-Q6).
+Caching: `Swatinem/rust-cache`, pnpm store cache. **Public repo** (v0.5-Q6): the full macOS + Windows matrix runs on every push and PR at no cost.
 
 ### 5.12 Security checklist (S0)
 
 | Area | Rule |
 |---|---|
 | Tauri capabilities | The main window gets only the core command set; extension iframes get **none** (they can't invoke) |
-| CSP | Main window: `default-src 'self' customprotocol: asset:`; no `unsafe-eval`; Mermaid in strict mode. Extension pages: `default-src 'self'`; `connect-src` only for declared network permissions (empty in S0) |
+| CSP | Main window: `default-src 'self' customprotocol: asset:; connect-src 'self' ipc: http://ipc.localhost` (A-1); no `unsafe-eval`; Mermaid in strict mode. Extension pages: `default-src 'self'`; `connect-src` only for declared network permissions (empty in S0) |
 | Raw HTML | Escaped (R-17) |
 | WebDriver plugin | Compiled **only** with the `e2e` cargo feature; release builds fail CI if the feature is on |
 | Secrets | Keychain only; redaction everywhere; GUI never receives values |
@@ -586,7 +598,7 @@ flowchart LR
 ```
 
 **Estimate:** 26 tasks, about 25–30 agent-days of sessions. With your reviews, that's roughly 6–8 calendar weeks at a relaxed pace (no deadline, D-005).
-💰 **AI cost:** implementation runs on your Claude subscription. S0's only pay-per-token calls are "test connection" calls (fractions of a cent). CI cost depends on v0.5-Q6.
+💰 **AI cost:** implementation runs on your Claude subscription. S0's only pay-per-token calls are "test connection" calls (fractions of a cent). CI is free (public repo, v0.5-Q6). Tasks are delivered as **one branch + PR each**, merged by you after green CI (v0.5-Q9).
 
 ---
 
@@ -600,14 +612,15 @@ flowchart LR
 | TypeScript 7 (native) ecosystem gaps | Tooling breaks | Fall back to TS 5.9 `tsc` for type-checking if a tool fails |
 | Mermaid 12 rendering differences across webviews | Visual bugs | Golden corpus E2E screenshots on both OSes (stretch goal in T-24) |
 | Keychain prompts on macOS during tests | Flaky CI | Mock keychain in unit tests; one real round-trip test per OS, tolerant of runner setup |
-| GitHub Actions macOS minutes | Cost | v0.5-Q6 |
+| **Claude Pro** has the tightest usage limits of the Claude plans | Slower progress (waiting for the usage window to reset) | Keep tasks small (one session each); hand mechanical work (fixtures, formatting, doc updates) to OpenCode on your Go plan; review PRs while the window resets |
 | Scope: 26 tasks is a lot for "foundations" | Slow start | Each milestone is demoable; Parking Lot for everything new |
 
 ## 8. Amendments
 
 | ID | Date | Change | Status |
 |---|---|---|---|
-| — | — | (none yet; the spec is still a draft) | — |
+| A-1 | 2026-10-11 | §5.12 CSP row: main window CSP gains `connect-src 'self' ipc: http://ipc.localhost`. Without it, Tauri's IPC custom protocol is blocked in release builds and silently falls back to the slower postMessage bridge (Tauri CSP docs). No change to the rules (still no `unsafe-eval`) | ✅ approved (user, 2026-10-11) → v1.0.1 |
+| A-2 | 2026-10-11 | §5.4: `AtabeyError` becomes `{ kind: ErrorKind, message }` (kind flattened and tagged by code), plus `IpcResult<T>`. `Provider.message` → `detail`, `Internal.message` → `summary` (no clash with the flattened `message`). `Timeout.after_ms` is `u32` (specta refuses `u64` for TypeScript). `CapKind`, `Permission`, `PanelSlot`, `HostPattern`, `BudgetRequestId`, `ProviderId` live in `atabey-types`. Resolves the clash between R-5 ("code + message + details") and the §5.4 sketch, which had no message. Details in ADR-0009 | ✅ approved (user, 2026-10-11, T-03 planning) → v1.0.2 |
 
 ## 9. Sources
 

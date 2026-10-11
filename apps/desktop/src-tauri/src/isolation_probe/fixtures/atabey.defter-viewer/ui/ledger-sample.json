@@ -1,0 +1,26 @@
+{
+  "entries": [
+    {
+      "seq": 1841,
+      "at": "2026-10-12T09:14:03Z",
+      "kind": "model_call",
+      "provider": "openrouter",
+      "model": "deepseek/deepseek-v4",
+      "cost_usd": "0.0042"
+    },
+    {
+      "seq": 1842,
+      "at": "2026-10-12T09:14:09Z",
+      "kind": "budget_check",
+      "cap": "daily",
+      "remaining_usd": "2.4120"
+    },
+    {
+      "seq": 1843,
+      "at": "2026-10-12T09:15:51Z",
+      "kind": "task_finished",
+      "task": "T-04",
+      "outcome": "passed"
+    }
+  ]
+}
