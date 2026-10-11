@@ -1,0 +1,11 @@
+:root {
+  --atabey-panel: loaded;
+  color-scheme: light dark;
+}
+
+.panel {
+  font:
+    14px / 1.5 system-ui,
+    sans-serif;
+  padding: 12px 16px;
+}

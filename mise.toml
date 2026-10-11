@@ -24,10 +24,16 @@ description = "Formatting check, clippy, Biome, TypeScript type-check, workflow 
 run = [
   "cargo fmt --all --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo clippy -p atabey-desktop --all-targets --features isolation-probe -- -D warnings",
   "pnpm exec biome check .",
   "pnpm -r --if-present typecheck",
   "actionlint",
 ]
+
+[tasks.probe]
+depends = ["web"]
+description = "Extension iframe isolation probe (T-04, ADR-0007): opens a window, exits 0 when isolated"
+run = "cargo run -p atabey-desktop --features isolation-probe,tauri/custom-protocol -- --isolation-probe"
 
 [tasks.deny]
 description = "License and advisory policy (deny.toml)"

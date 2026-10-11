@@ -27,8 +27,30 @@ pub const ISOLATED_HOST: &str = "sandbox";
 /// The spec-literal host (`atabey-ext://localhost/…`). Only the spike uses it, to measure it.
 pub const LOCALHOST_HOST: &str = "localhost";
 
-/// The Content-Security-Policy of every extension page (S0 spec §5.12).
-pub const EXTENSION_CSP: &str = "default-src 'self'";
+/// What S0 spec §5.12 prescribes for extension pages. It does **not** work: in a sandboxed
+/// (opaque-origin) document WebKit does not match `'self'`, so the page's own scripts, styles and
+/// JSON are blocked (measured by the T-04 spike, ADR-0007). Kept only so the spike can show the
+/// difference; [`extension_csp`] is what is served.
+pub const SPEC_CSP: &str = "default-src 'self'";
+
+/// `Access-Control-Allow-Origin` of every response. A sandboxed page has the origin `null`, and
+/// module scripts and `fetch()` need CORS (measured: without it `<script type="module">` and
+/// `fetch("./file.json")` fail while classic scripts and stylesheets load).
+pub const ALLOW_ORIGIN: &str = "null";
+
+/// The Content-Security-Policy of an extension page: its own folder and nothing else.
+///
+/// Scoped to `<origin>/<extension id>/`, so a page can load its own files but not the main
+/// window's (`tauri://localhost`) and not another extension's (measured on macOS, ADR-0007).
+#[must_use]
+pub fn extension_csp(windows: bool, host: &str, extension: &ExtensionId) -> String {
+    let origin = if windows {
+        format!("http://{SCHEME}.{host}")
+    } else {
+        format!("{SCHEME}://{host}")
+    };
+    format!("default-src {origin}/{extension}/")
+}
 
 /// Where extension UI files come from.
 pub trait UiAssets {
@@ -124,18 +146,29 @@ pub fn mime_for(file: &str) -> &'static str {
     }
 }
 
-fn reply(status: StatusCode, content_type: &'static str, body: Cow<'static, [u8]>) -> Response<Cow<'static, [u8]>> {
+fn reply(
+    status: StatusCode,
+    content_type: &'static str,
+    csp: &str,
+    body: Cow<'static, [u8]>,
+) -> Response<Cow<'static, [u8]>> {
     let mut response = Response::new(body);
     *response.status_mut() = status;
     let headers = response.headers_mut();
-    let fixed: [(HeaderName, &'static str); 4] = [
+    let fixed: [(HeaderName, &'static str); 5] = [
         (header::CONTENT_TYPE, content_type),
-        (header::CONTENT_SECURITY_POLICY, EXTENSION_CSP),
         (header::X_CONTENT_TYPE_OPTIONS, "nosniff"),
         (header::CACHE_CONTROL, "no-store"),
+        (header::ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ORIGIN),
+        (header::CONTENT_SECURITY_POLICY, "default-src 'none'"),
     ];
     for (name, value) in fixed {
         headers.insert(name, HeaderValue::from_static(value));
+    }
+    // The extension id and host are validated, so this cannot fail; if it ever did, the
+    // restrictive `default-src 'none'` above stays.
+    if let Ok(value) = HeaderValue::from_str(csp) {
+        headers.insert(header::CONTENT_SECURITY_POLICY, value);
     }
     response
 }
@@ -144,15 +177,19 @@ fn refuse(status: StatusCode, reason: &'static str) -> Response<Cow<'static, [u8
     reply(
         status,
         "text/plain; charset=utf-8",
+        "default-src 'none'",
         Cow::Borrowed(reason.as_bytes()),
     )
 }
 
 /// Answers one request: the file with its security headers, or an error status.
 ///
-/// 405 for anything but GET, 400 for a path that is not plain and relative, 404 for an unknown
-/// extension or file.
-pub fn respond<A: UiAssets>(assets: &A, request: &Request<Vec<u8>>) -> Response<Cow<'static, [u8]>> {
+/// 405 for anything but GET, 400 for a host that is not ours or a path that is not plain and
+/// relative, 404 for an unknown extension or file.
+pub fn respond<A: UiAssets>(
+    assets: &A,
+    request: &Request<Vec<u8>>,
+) -> Response<Cow<'static, [u8]>> {
     if request.method() != Method::GET {
         let mut response = refuse(StatusCode::METHOD_NOT_ALLOWED, "method not allowed");
         response
@@ -164,13 +201,21 @@ pub fn respond<A: UiAssets>(assets: &A, request: &Request<Vec<u8>>) -> Response<
         Ok(parsed) => parsed,
         Err(_) => return refuse(StatusCode::BAD_REQUEST, "bad path"),
     };
+    let host = request.uri().host().unwrap_or_default();
+    if host != ISOLATED_HOST && host != LOCALHOST_HOST {
+        return refuse(StatusCode::BAD_REQUEST, "bad host");
+    }
     match assets.get(&extension, &file) {
-        Some(bytes) => reply(StatusCode::OK, mime_for(&file), bytes),
+        Some(bytes) => {
+            let csp = extension_csp(cfg!(windows), host, &extension);
+            reply(StatusCode::OK, mime_for(&file), &csp, bytes)
+        }
         None => refuse(StatusCode::NOT_FOUND, "not found"),
     }
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used)] // fixed, valid test inputs
 mod tests {
     use super::*;
 
@@ -209,22 +254,64 @@ mod tests {
     fn serves_a_known_file_with_security_headers() {
         let response = get("atabey-ext://sandbox/atabey.defter-viewer/ui/index.html");
         assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(response.body().as_ref(), b"<!doctype html><title>Defter</title>");
-        assert_eq!(header_of(&response, &header::CONTENT_TYPE), "text/html; charset=utf-8");
-        assert_eq!(header_of(&response, &header::CONTENT_SECURITY_POLICY), "default-src 'self'");
-        assert_eq!(header_of(&response, &header::X_CONTENT_TYPE_OPTIONS), "nosniff");
+        assert_eq!(
+            response.body().as_ref(),
+            b"<!doctype html><title>Defter</title>"
+        );
+        assert_eq!(
+            header_of(&response, &header::CONTENT_TYPE),
+            "text/html; charset=utf-8"
+        );
+        assert_eq!(
+            header_of(&response, &header::CONTENT_SECURITY_POLICY),
+            extension_csp(
+                cfg!(windows),
+                ISOLATED_HOST,
+                &ExtensionId::from("atabey.defter-viewer")
+            )
+        );
+        assert_eq!(
+            header_of(&response, &header::ACCESS_CONTROL_ALLOW_ORIGIN),
+            "null"
+        );
+        assert_eq!(
+            header_of(&response, &header::X_CONTENT_TYPE_OPTIONS),
+            "nosniff"
+        );
         assert_eq!(header_of(&response, &header::CACHE_CONTROL), "no-store");
     }
 
     #[test]
-    fn the_windows_request_form_is_served_too() {
-        // wry maps http://atabey-ext.sandbox/… back to atabey-ext://sandbox/… before the handler;
-        // the path is the same either way.
-        let response = get("http://atabey-ext.sandbox/atabey.defter-viewer/ui/panel.mjs");
-        assert_eq!(response.status(), StatusCode::OK);
+    fn a_host_that_is_not_ours_is_a_400() {
+        for uri in [
+            "atabey-ext://evil/atabey.defter-viewer/ui/index.html",
+            "atabey-ext://sandbox.evil/atabey.defter-viewer/ui/index.html",
+            "/atabey.defter-viewer/ui/index.html",
+        ] {
+            assert_eq!(get(uri).status(), StatusCode::BAD_REQUEST, "{uri}");
+        }
+    }
+
+    #[test]
+    fn the_csp_is_scoped_to_the_extension_folder_in_both_url_forms() {
+        let ext = ExtensionId::from("atabey.git-pulse");
         assert_eq!(
-            header_of(&response, &header::CONTENT_TYPE),
-            "text/javascript; charset=utf-8"
+            extension_csp(false, ISOLATED_HOST, &ext),
+            "default-src atabey-ext://sandbox/atabey.git-pulse/"
+        );
+        assert_eq!(
+            extension_csp(true, ISOLATED_HOST, &ext),
+            "default-src http://atabey-ext.sandbox/atabey.git-pulse/"
+        );
+    }
+
+    #[test]
+    fn errors_get_the_most_restrictive_csp_and_no_file_headers_leak() {
+        let response = get("atabey-ext://sandbox/atabey.git-pulse/ui/index.html");
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        assert_eq!(
+            header_of(&response, &header::CONTENT_SECURITY_POLICY),
+            "default-src 'none'"
         );
     }
 
@@ -240,14 +327,24 @@ mod tests {
 
     #[test]
     fn only_get_is_allowed() {
-        for method in [Method::POST, Method::PUT, Method::DELETE, Method::HEAD, Method::OPTIONS] {
+        for method in [
+            Method::POST,
+            Method::PUT,
+            Method::DELETE,
+            Method::HEAD,
+            Method::OPTIONS,
+        ] {
             let request = Request::builder()
                 .method(method.clone())
                 .uri("atabey-ext://sandbox/atabey.defter-viewer/ui/index.html")
                 .body(Vec::new())
                 .expect("valid test request");
             let response = respond(&Fixed, &request);
-            assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED, "{method}");
+            assert_eq!(
+                response.status(),
+                StatusCode::METHOD_NOT_ALLOWED,
+                "{method}"
+            );
             assert_eq!(header_of(&response, &header::ALLOW), "GET");
         }
     }
@@ -283,7 +380,10 @@ mod tests {
             .expect("valid uri");
         assert_eq!(
             parse(&uri),
-            Ok((ExtensionId::from("atabey.git-pulse"), "ui/assets/panel.css".to_owned()))
+            Ok((
+                ExtensionId::from("atabey.git-pulse"),
+                "ui/assets/panel.css".to_owned()
+            ))
         );
     }
 

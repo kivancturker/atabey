@@ -18,13 +18,15 @@ tauri-build.workspace = true
 [dependencies]
 atabey-types.workspace = true
 serde.workspace = true
+serde_json.workspace = true
 specta.workspace = true
 specta-typescript.workspace = true
 tauri = { workspace = true, features = ["specta"] }
 tauri-specta.workspace = true
 
-[dev-dependencies]
-serde_json.workspace = true
+[features]
+# T-04 isolation probe (ADR-0007). Never enabled in release builds.
+isolation-probe = []
 
 [lints]
 workspace = true
