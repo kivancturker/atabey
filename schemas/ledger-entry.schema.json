@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LedgerEntry",
+  "description": "One line of the ledger (spec §5.4, §5.8).",
+  "type": "object",
+  "properties": {
+    "actor": {
+      "description": "Who did it.",
+      "$ref": "#/$defs/Actor"
+    },
+    "correlation": {
+      "description": "The user-initiated flow this entry belongs to.",
+      "$ref": "#/$defs/CorrelationId"
+    },
+    "data": {
+      "description": "Structured detail about the event. Redacted before it is written (T-06)."
+    },
+    "id": {
+      "description": "This entry's own id (UUIDv7).",
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "description": "What kind of event it was.",
+      "$ref": "#/$defs/EntryKind"
+    },
+    "outcome": {
+      "description": "How it ended.",
+      "$ref": "#/$defs/Outcome"
+    },
+    "summary": {
+      "description": "A short human-readable description. Never the full payload.",
+      "type": "string"
+    },
+    "ts": {
+      "description": "When the entry was written (UTC, RFC 3339).",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ts",
+    "id",
+    "correlation",
+    "actor",
+    "kind",
+    "summary",
+    "outcome",
+    "data"
+  ],
+  "$defs": {
+    "Actor": {
+      "description": "Who caused an entry.",
+      "oneOf": [
+        {
+          "description": "The person using the app.",
+          "type": "string",
+          "const": "user"
+        },
+        {
+          "description": "Atabey itself.",
+          "type": "string",
+          "const": "core"
+        },
+        {
+          "description": "An extension.",
+          "type": "object",
+          "properties": {
+            "extension": {
+              "$ref": "#/$defs/ExtensionId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "extension"
+          ]
+        },
+        {
+          "description": "A coding agent or an observer, by name.",
+          "type": "object",
+          "properties": {
+            "agent": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "agent"
+          ]
+        },
+        {
+          "description": "A model provider.",
+          "type": "object",
+          "properties": {
+            "provider": {
+              "$ref": "#/$defs/ProviderId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ]
+        }
+      ]
+    },
+    "CorrelationId": {
+      "description": "Ties together everything that happens in one user-initiated flow (Defter, logs, IPC).",
+      "type": "string",
+      "format": "uuid"
+    },
+    "EntryKind": {
+      "description": "What happened. The four sources R-21 lists, plus `system` for events of Atabey's own.\nAdding a variant later is a compatible change for readers that ignore unknown kinds.",
+      "oneOf": [
+        {
+          "description": "Something the user did in the GUI, e.g. `open_project`.",
+          "type": "object",
+          "properties": {
+            "action": {
+              "description": "The action's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "user_action"
+            }
+          },
+          "required": [
+            "type",
+            "action"
+          ]
+        },
+        {
+          "description": "A Tauri command, e.g. `project_open`.",
+          "type": "object",
+          "properties": {
+            "command": {
+              "description": "The command's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "ipc_command"
+            }
+          },
+          "required": [
+            "type",
+            "command"
+          ]
+        },
+        {
+          "description": "A message an extension sent or received over Ulak.",
+          "type": "object",
+          "properties": {
+            "topic": {
+              "description": "The Ulak topic or command, e.g. `defter.query`.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "extension_message"
+            }
+          },
+          "required": [
+            "type",
+            "topic"
+          ]
+        },
+        {
+          "description": "A call to a model provider.",
+          "type": "object",
+          "properties": {
+            "model": {
+              "description": "The model id, e.g. `anthropic/claude-sonnet-5`.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "llm_call"
+            }
+          },
+          "required": [
+            "type",
+            "model"
+          ]
+        },
+        {
+          "description": "An event inside Atabey that no user action triggered, e.g. a retention run.",
+          "type": "object",
+          "properties": {
+            "event": {
+              "description": "The event's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "system"
+            }
+          },
+          "required": [
+            "type",
+            "event"
+          ]
+        }
+      ]
+    },
+    "ExtensionId": {
+      "description": "An extension's reverse-DNS id, e.g. `atabey.defter-viewer`.",
+      "type": "string"
+    },
+    "Outcome": {
+      "description": "How an event ended.",
+      "oneOf": [
+        {
+          "description": "It worked.",
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "ok"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        },
+        {
+          "description": "It failed.",
+          "type": "object",
+          "properties": {
+            "code": {
+              "description": "The `AtabeyError` code, e.g. `timeout`.",
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "failed"
+            }
+          },
+          "required": [
+            "status",
+            "code"
+          ]
+        },
+        {
+          "description": "A permission or budget check refused it.",
+          "type": "object",
+          "properties": {
+            "reason": {
+              "description": "Why.",
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "denied"
+            }
+          },
+          "required": [
+            "status",
+            "reason"
+          ]
+        },
+        {
+          "description": "It was stopped before it finished.",
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "cancelled"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      ]
+    },
+    "ProviderId": {
+      "description": "A model provider's id, e.g. `openrouter`.",
+      "type": "string"
+    }
+  }
+}

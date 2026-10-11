@@ -16,6 +16,7 @@ publish = false
 # Crates opt in with `foo.workspace = true`; add here first, never in a member crate.
 [workspace.dependencies]
 # Workspace crates (the version keeps cargo-deny from treating path deps as wildcards).
+atabey-defter = { path = "crates/atabey-defter", version = "0.1.0" }
 atabey-types = { path = "crates/atabey-types", version = "0.1.0" }
 
 tauri = "2.12"
@@ -24,6 +25,7 @@ tauri-build = "2.7"   # versioned independently of tauri (latest 2.7.2, crates.i
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript"] }
 specta = { version = "=2.0.0-rc.25", features = ["derive", "function", "uuid", "rust_decimal"] }
 specta-typescript = "=0.0.12"
+specta-serde = "=0.0.12"   # serde-attribute-aware format for specta exports (used by atabey-defter tests)
 tokio = { version = "1.53", features = ["rt-multi-thread", "macros", "sync", "time", "process", "io-util", "fs"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -42,6 +44,8 @@ tracing-appender = "0.2"
 uuid = { version = "1.28", features = ["v7", "serde"] }
 rust_decimal = "1.43"           # money is never f64; serializes as a string
 thiserror = "2.0"
+time = { version = "0.3.55", features = ["formatting", "parsing", "serde-well-known"] }  # ADR-0010: Defter timestamps and day folders
+tempfile = "3.27"                # test fixtures (temp dirs)
 anyhow = "1.0"
 insta = "1.49"
 proptest = "1.11"

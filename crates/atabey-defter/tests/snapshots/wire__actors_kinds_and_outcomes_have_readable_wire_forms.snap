@@ -1,0 +1,56 @@
+---
+source: crates/atabey-defter/tests/wire.rs
+---
+{
+  "actors": [
+    "user",
+    "core",
+    {
+      "extension": "atabey.defter-viewer"
+    },
+    {
+      "agent": "claude-code"
+    },
+    {
+      "provider": "openrouter"
+    }
+  ],
+  "kinds": [
+    {
+      "action": "open_project",
+      "type": "user_action"
+    },
+    {
+      "command": "project_open",
+      "type": "ipc_command"
+    },
+    {
+      "topic": "defter.query",
+      "type": "extension_message"
+    },
+    {
+      "model": "anthropic/claude-sonnet-5",
+      "type": "llm_call"
+    },
+    {
+      "event": "retention_run",
+      "type": "system"
+    }
+  ],
+  "outcomes": [
+    {
+      "status": "ok"
+    },
+    {
+      "code": "timeout",
+      "status": "failed"
+    },
+    {
+      "reason": "daily cap reached",
+      "status": "denied"
+    },
+    {
+      "status": "cancelled"
+    }
+  ]
+}

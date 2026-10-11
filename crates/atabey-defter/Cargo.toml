@@ -1,0 +1,32 @@
+[package]
+name = "atabey-defter"
+description = "Defter: the append-only ledger (JSON Lines), correlation ids and app-log setup (specs/S0-foundations.md R-21, R-22)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+atabey-types.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true  # `Unknown` marks the free-form `data` field as TypeScript `unknown`
+thiserror.workspace = true
+time.workspace = true
+tracing.workspace = true
+tracing-appender.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+insta = { workspace = true, features = ["json"] }
+specta-serde.workspace = true
+tempfile.workspace = true
+time = { workspace = true, features = ["macros"] }
+
+[lints]
+workspace = true
