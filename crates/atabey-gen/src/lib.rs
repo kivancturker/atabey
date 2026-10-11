@@ -5,6 +5,7 @@
 
 use std::path::{Path, PathBuf};
 
+use atabey_defter::LedgerEntry;
 use atabey_types::AtabeyError;
 use schemars::{Schema, schema_for};
 
@@ -15,6 +16,8 @@ pub fn schemas() -> Vec<(&'static str, Schema)> {
     vec![
         // The error contract Ulak extensions receive (T-21).
         ("atabey-error.schema.json", schema_for!(AtabeyError)),
+        // One line of the Defter ledger (R-21); readers of `.jsonl` files validate against it.
+        ("ledger-entry.schema.json", schema_for!(LedgerEntry)),
     ]
 }
 

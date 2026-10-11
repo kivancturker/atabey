@@ -13,6 +13,7 @@
 | [0007](ADR-0007-extension-iframe-isolation.md) | Extension UI isolation: sandboxed iframes on atabey-ext:// | Accepted | 2026-10-12 |
 | [0008](ADR-0008-ignore-proc-macro-error-advisory.md) | Ignore RUSTSEC-2024-0370 (proc-macro-error) from Tauri's Linux GTK stack | Accepted | 2026-10-11 |
 | [0009](ADR-0009-ipc-bindings-export-and-error-audit.md) | IPC bindings: export path, error shape and error-type audit | Accepted | 2026-10-11 |
+| [0010](ADR-0010-defter-ledger-time-and-kinds.md) | Defter ledger: the time crate, UTC day folders, entry kinds and the clock seam | Proposed | 2026-10-12 |
 
 ## Template
 

@@ -11,7 +11,7 @@ mod permission;
 
 pub use budget::CapKind;
 pub use error::{AtabeyError, ErrorKind, IpcResult};
-pub use ids::{BudgetRequestId, CorrelationId, ExtensionId, ProjectId, ProviderId};
+pub use ids::{BudgetRequestId, CorrelationId, ExtensionId, ProjectId, ProviderId, SessionId};
 pub use permission::{HostPattern, PanelSlot, Permission};
 
 /// Re-exported so dependents name the same decimal type the errors use.

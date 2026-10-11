@@ -78,6 +78,10 @@ uuid_id!(
     CorrelationId
 );
 uuid_id!(
+    /// Identifies one app run. The Defter ledger writes one `<session-id>.jsonl` file per session.
+    SessionId
+);
+uuid_id!(
     /// Identifies one paused model request waiting for the user's budget decision.
     BudgetRequestId
 );

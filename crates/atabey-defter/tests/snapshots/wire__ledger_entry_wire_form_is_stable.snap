@@ -1,0 +1,24 @@
+---
+source: crates/atabey-defter/tests/wire.rs
+---
+{
+  "ts": "2026-10-12T09:30:15.25Z",
+  "id": "01920f4f-1a2b-7c3d-8e4f-5a6b7c8d9e0f",
+  "correlation": "01920f4e-9d20-7b66-a1c4-3e5f7a9b1d28",
+  "actor": {
+    "provider": "openrouter"
+  },
+  "kind": {
+    "type": "llm_call",
+    "model": "anthropic/claude-sonnet-5"
+  },
+  "summary": "OpenRouter chat completion for the spec review observer",
+  "outcome": {
+    "status": "failed",
+    "code": "timeout"
+  },
+  "data": {
+    "completion_tokens": 0,
+    "prompt_tokens": 18432
+  }
+}
