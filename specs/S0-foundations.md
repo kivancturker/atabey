@@ -2,9 +2,9 @@
 id: S0
 title: Foundations
 status: frozen
-version: 1.0.4
+version: 1.0.5
 frozen: 2026-10-10
-approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1, A-2 approved 2026-10-11; A-3, A-4 approved 2026-10-12
+approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1, A-2 approved 2026-10-11; A-3, A-4, A-5 approved 2026-10-12
 depends_on: []
 product-spec: ../PRODUCT-SPEC.md (v1.1.0)
 constitution: ../CONSTITUTION.md (v1.1.0)
@@ -528,7 +528,7 @@ Each task fits **one agent session** (Claude Code), lists the requirements it se
 | **T-07** | Retention + compaction job (injectable clock) | R-24 | S |
 | **T-08** | `atabey-settings`: TOML layering, typed keys, keychain secrets (`keyring`), secret-status IPC | R-26, R-27 | M |
 | **T-09** | `atabey-project`: open/create `.atabey/project.toml`, recent list, gix read-only info, watcher (notify + debouncer), SQLite index (rebuild-on-version) | R-6–R-8 | L |
-| **T-10** | `atabey-core` composition root + `atabey-cli` (`settings`, `defter query`) | R-40 | S |
+| **T-10** | `atabey-core` composition root + `atabey-cli` (`settings`, `defter query`); `defter.query` with filters by time, kind and correlation id (A-5) | R-25 (query), R-40 | S |
 
 ### M3: Documents & themes
 
@@ -554,7 +554,7 @@ Each task fits **one agent session** (Claude Code), lists the requirements it se
 | Task | Delivers | Reqs | Size |
 |---|---|---|---|
 | **T-20** | `atabey-jsonrpc`: NDJSON framing, request/response correlation, cancellation | R-33 | S |
-| **T-21** | `atabey-ulak`: broker, command + event routing, permissions, schema validation, Defter hops, core events | R-35, R-36 | L |
+| **T-21** | `atabey-ulak`: broker, command + event routing, permissions, schema validation, Defter hops, core events (publishes `defter.appended`, A-5) | R-25 (event), R-35, R-36 | L |
 | **T-22** | `atabey-ext-host`: manifest schema, discovery, permission grants, process supervisor (restart once), `atabey-ext://` scheme (from T-04), `packages/ext-bridge` | R-32–R-34 | L |
 | **T-23** | **Defter Viewer** extension (Rust backend + React UI) | R-37 | M |
 
@@ -623,7 +623,7 @@ flowchart LR
 | A-2 | 2026-10-11 | §5.4: `AtabeyError` becomes `{ kind: ErrorKind, message }` (kind flattened and tagged by code), plus `IpcResult<T>`. `Provider.message` → `detail`, `Internal.message` → `summary` (no clash with the flattened `message`). `Timeout.after_ms` is `u32` (specta refuses `u64` for TypeScript). `CapKind`, `Permission`, `PanelSlot`, `HostPattern`, `BudgetRequestId`, `ProviderId` live in `atabey-types`. Resolves the clash between R-5 ("code + message + details") and the §5.4 sketch, which had no message. Details in ADR-0009 | ✅ approved (user, 2026-10-11, T-03 planning) → v1.0.2 |
 | A-3 | 2026-10-12 | §5.12 CSP row: main window CSP gains `frame-src atabey-ext://sandbox http://atabey-ext.sandbox` (the second source is the Windows form of the scheme). Without it `default-src` blocks every extension iframe. Only the host selected by the T-04 spike is listed; the v0.5 `localhost` host stays blocked. Details in ADR-0007 | ✅ approved in principle (user, 2026-10-12, T-04 planning); source list fixed by the spike → v1.0.3 |
 | A-4 | 2026-10-12 | §5.12 CSP row, extension pages: `default-src 'self'` → `default-src atabey-ext://sandbox/<extension id>/` (Windows: `http://atabey-ext.sandbox/<extension id>/`), and every `atabey-ext://` response carries `Access-Control-Allow-Origin: null`. Measured by the T-04 spike on macOS and Windows: in a sandboxed (opaque-origin) page `'self'` matches nothing, so the page's own scripts, styles and JSON are blocked; module scripts and `fetch()` are CORS requests. The folder-scoped source also stops one extension from reading another's files. `connect-src` rule unchanged. Details in ADR-0007 | ✅ approved (user, 2026-10-12) → v1.0.4 |
-| A-5 | 2026-10-12 | §6 task tables: R-25 is assigned to no task. **T-10** gains R-25 for `defter.query` (filter by time, kind, correlation id; T-10 already delivers the `defter query` CLI and the composition root). **T-21** gains R-25 for publishing `defter.appended` (T-21 already delivers the R-36 core events, which include it). No requirement or acceptance criterion changes; AC-10 still verifies R-21 and R-25. Found during T-05, which stays at R-21 and R-22 | ⏳ proposed (waits for the user) |
+| A-5 | 2026-10-12 | §6 task tables: R-25 is assigned to no task. **T-10** gains R-25 for `defter.query` (filter by time, kind, correlation id; T-10 already delivers the `defter query` CLI and the composition root). **T-21** gains R-25 for publishing `defter.appended` (T-21 already delivers the R-36 core events, which include it). No requirement or acceptance criterion changes; AC-10 still verifies R-21 and R-25. Found during T-05, which stays at R-21 and R-22 | ✅ approved (user, 2026-10-12) → v1.0.5 |
 
 ## 9. Sources
 
