@@ -2,9 +2,9 @@
 id: S0
 title: Foundations
 status: frozen
-version: 1.0.0
+version: 1.0.1
 frozen: 2026-10-10
-approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied)
+approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1 approved 2026-10-11
 depends_on: []
 product-spec: ../PRODUCT-SPEC.md (v1.1.0)
 constitution: ../CONSTITUTION.md (v1.1.0)
@@ -488,7 +488,7 @@ Caching: `Swatinem/rust-cache`, pnpm store cache. **Public repo** (v0.5-Q6): the
 | Area | Rule |
 |---|---|
 | Tauri capabilities | The main window gets only the core command set; extension iframes get **none** (they can't invoke) |
-| CSP | Main window: `default-src 'self' customprotocol: asset:`; no `unsafe-eval`; Mermaid in strict mode. Extension pages: `default-src 'self'`; `connect-src` only for declared network permissions (empty in S0) |
+| CSP | Main window: `default-src 'self' customprotocol: asset:; connect-src 'self' ipc: http://ipc.localhost` (A-1); no `unsafe-eval`; Mermaid in strict mode. Extension pages: `default-src 'self'`; `connect-src` only for declared network permissions (empty in S0) |
 | Raw HTML | Escaped (R-17) |
 | WebDriver plugin | Compiled **only** with the `e2e` cargo feature; release builds fail CI if the feature is on |
 | Secrets | Keychain only; redaction everywhere; GUI never receives values |
@@ -609,7 +609,7 @@ flowchart LR
 
 | ID | Date | Change | Status |
 |---|---|---|---|
-| A-1 | 2026-10-11 | §5.12 CSP row: main window CSP gains `connect-src 'self' ipc: http://ipc.localhost`. Without it, Tauri's IPC custom protocol is blocked in release builds and silently falls back to the slower postMessage bridge (Tauri CSP docs). No change to the rules (still no `unsafe-eval`) | 🟡 proposed (found in T-02 review); applied in `tauri.conf.json` on the T-02 branch pending your approval |
+| A-1 | 2026-10-11 | §5.12 CSP row: main window CSP gains `connect-src 'self' ipc: http://ipc.localhost`. Without it, Tauri's IPC custom protocol is blocked in release builds and silently falls back to the slower postMessage bridge (Tauri CSP docs). No change to the rules (still no `unsafe-eval`) | ✅ approved (user, 2026-10-11) → v1.0.1 |
 
 ## 9. Sources
 
