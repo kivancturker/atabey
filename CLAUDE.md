@@ -13,6 +13,10 @@
 3. `ROADMAP.md` and the active slice spec (`specs/`): which task is next
 4. `git status` / current branch: is a task already in progress?
 
+## Model routing (Claude Pro limits)
+
+Follow [`docs/process/model-routing.md`](docs/process/model-routing.md): **Tier H** = plan in plan mode (`opusplan`, the project default) → Sonnet executes → `reviewer` subagent (Opus) before the PR; **Tier M** = Sonnet (`implementer` subagent or the main session outside plan mode); **Tier L** = `mechanical` subagent (Haiku). One fresh session per task. Never use Fable (it can bill to usage credits on Pro).
+
 ## Design rounds (question files)
 
 The brainstorm Q&A format continues for **slice spec reviews** (e.g., the S1 spec). Each round is a new versioned folder `docs/brainstorm/vX.Y/` with `SUMMARY.md`, `01-CLARIFICATIONS.md` (answer every `❓ Clarify` and react to every custom answer), numbered proposal files, an open-questions file (IDs prefixed with the session, e.g., `v0.6-Q3`) and `NN-ACTION-*.md` for things the user must do.

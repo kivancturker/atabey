@@ -30,6 +30,7 @@ flowchart LR
 | **Branches** | One branch per task: `s<slice>/t-<nn>-<short-name>` (e.g., `s0/t-09-project-model`). Never commit to `main` (D-126) |
 | **Done** | Every acceptance criterion the task covers has an automated test; `mise run check` is green; CI is green on macOS + Windows |
 | **ADRs** | A decision that isn't already in the spec gets an ADR in `adr/` (template: [`adr/README.md`](adr/README.md)) |
+| **Tiers** | Every task has a tier (H / M / L) that decides which model plans, writes and reviews it: [`docs/process/model-routing.md`](docs/process/model-routing.md) |
 
 ## Commands
 
