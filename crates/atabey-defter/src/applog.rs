@@ -1,12 +1,14 @@
+use std::io::{self, Write};
 use std::path::Path;
 
 use tracing::Dispatch;
-use tracing_appender::non_blocking::WorkerGuard;
+use tracing_appender::non_blocking::{NonBlocking, WorkerGuard};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::EnvFilter;
-use tracing_subscriber::fmt;
+use tracing_subscriber::fmt::{self as subscriber_fmt, MakeWriter};
 
 use crate::error::LogError;
+use crate::redact::Redactor;
 
 /// How app-log lines are written.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -32,9 +34,16 @@ pub struct AppLog {
 ///
 /// Old files are left alone; deleting them is retention's job (T-07, R-24).
 ///
+/// Every line is redacted with `redactor` before it reaches the file (R-23).
+///
 /// # Errors
 /// Returns [`LogError::Setup`] if the folder or file can't be created.
-pub fn app_log(dir: &Path, format: LogFormat, filter: EnvFilter) -> Result<AppLog, LogError> {
+pub fn app_log(
+    dir: &Path,
+    format: LogFormat,
+    filter: EnvFilter,
+    redactor: Redactor,
+) -> Result<AppLog, LogError> {
     let appender = RollingFileAppender::builder()
         .rotation(Rotation::DAILY)
         .filename_prefix("atabey")
@@ -46,9 +55,12 @@ pub fn app_log(dir: &Path, format: LogFormat, filter: EnvFilter) -> Result<AppLo
         })?;
     let (writer, guard) = tracing_appender::non_blocking(appender);
 
-    let builder = fmt()
+    let builder = subscriber_fmt::fmt()
         .with_env_filter(filter)
-        .with_writer(writer)
+        .with_writer(RedactingMakeWriter {
+            inner: writer,
+            redactor,
+        })
         .with_ansi(false);
     let dispatch = match format {
         LogFormat::Text => Dispatch::new(builder.finish()),
@@ -63,9 +75,54 @@ pub fn app_log(dir: &Path, format: LogFormat, filter: EnvFilter) -> Result<AppLo
 ///
 /// # Errors
 /// Returns [`LogError`] if the file can't be created or a subscriber is already installed.
-pub fn init_app_log(dir: &Path, format: LogFormat) -> Result<WorkerGuard, LogError> {
+pub fn init_app_log(
+    dir: &Path,
+    format: LogFormat,
+    redactor: Redactor,
+) -> Result<WorkerGuard, LogError> {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    let AppLog { dispatch, guard } = app_log(dir, format, filter)?;
+    let AppLog { dispatch, guard } = app_log(dir, format, filter, redactor)?;
     tracing::dispatcher::set_global_default(dispatch).map_err(|_| LogError::AlreadyInstalled)?;
     Ok(guard)
+}
+
+/// Hands `tracing-subscriber` a writer that redacts what it is given.
+///
+/// `tracing-subscriber` formats one event into one buffer and writes it with one `write_all`,
+/// so the writer always sees a whole line and a secret can't be split across two writes.
+#[derive(Debug, Clone)]
+struct RedactingMakeWriter {
+    inner: NonBlocking,
+    redactor: Redactor,
+}
+
+impl<'a> MakeWriter<'a> for RedactingMakeWriter {
+    type Writer = RedactingWriter;
+
+    fn make_writer(&'a self) -> Self::Writer {
+        RedactingWriter {
+            inner: self.inner.clone(),
+            redactor: self.redactor.clone(),
+        }
+    }
+}
+
+/// Never passes raw bytes through. It must not call `tracing` (that would recurse into itself).
+#[derive(Debug)]
+struct RedactingWriter {
+    inner: NonBlocking,
+    redactor: Redactor,
+}
+
+impl Write for RedactingWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        let text = String::from_utf8_lossy(buf);
+        let redacted = self.redactor.redact(&text);
+        self.inner.write_all(redacted.as_bytes())?;
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.inner.flush()
+    }
 }

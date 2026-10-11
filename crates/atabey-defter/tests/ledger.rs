@@ -4,7 +4,7 @@ mod common;
 
 use std::thread;
 
-use atabey_defter::{Clock, Ledger};
+use atabey_defter::{Clock, Ledger, Redactor};
 use common::*;
 use time::Duration;
 use time::macros::datetime;
@@ -146,6 +146,7 @@ fn a_second_session_appends_to_its_own_file_only() -> TestResult {
         project_id(),
         atabey_types::SessionId::new(),
         clock_at(MORNING),
+        Redactor::new(),
     );
 
     first.begin_flow().record(open_project_draft())?;
