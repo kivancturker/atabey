@@ -271,7 +271,7 @@ fn on_page_load(webview: &Webview<Wry>, payload: &PageLoadPayload<'_>) {
 
 /// Experiment hooks, probe builds only: replace the extension page CSP or add an
 /// `Access-Control-Allow-Origin` header without recompiling, to find the minimal header set
-/// that lets an opaque-origin page load its own files (ADR-0007, possible amendment A-4).
+/// that lets an opaque-origin page load its own files (ADR-0007, amendment A-4).
 fn apply_experiment_headers(response: &mut tauri::http::Response<Cow<'static, [u8]>>) {
     use tauri::http::{HeaderValue, header};
     let headers = response.headers_mut();

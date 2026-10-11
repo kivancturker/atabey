@@ -10,7 +10,7 @@ source: PRODUCT-SPEC.md (v1.1.0) §4–5 · docs/brainstorm/DECISIONS.md D-025, 
 
 | Slice | Name | Delivers | Spec | Status |
 |---|---|---|---|---|
-| **S0** | Foundations | Shell, typed IPC, renderer, themes, Defter, settings/secrets, budget meter, extension host + Ulak v0, CI | [S0-foundations.md](specs/S0-foundations.md) | 🔏 frozen v1.0.3 · 🚧 in progress |
+| **S0** | Foundations | Shell, typed IPC, renderer, themes, Defter, settings/secrets, budget meter, extension host + Ulak v0, CI | [S0-foundations.md](specs/S0-foundations.md) | 🔏 frozen v1.0.4 · 🚧 in progress |
 | S1 | Orhun · Codebase Atlas | tree-sitter facts, overview, lazy explanations, LSP "used by", cache | — | ⏳ |
 | S2 | Agent Session | ACP native (Claude Code + OpenCode) + Terminal fallback, Jev gate, diffs, checkpoints | — | ⏳ |
 | S3 | Divan + Tuğra | Brainstorm Studio, specs, freeze, amendments, Parking Lot, roadmap | — | ⏳ |

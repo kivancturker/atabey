@@ -9,7 +9,7 @@ spec: specs/S0-foundations.md (R-34, AC-17, §5.10, §5.12)
 
 # ADR-0007: Extension UI isolation — sandboxed iframes on `atabey-ext://`
 
-> **Status: accepted (2026-10-12).** Both systems are measured: macOS locally and in CI, Windows in CI ([run 38178105506](https://github.com/kivancturker/atabey/actions/runs/38178105506), commit `c126dc3`, `windows-latest`, 2026-10-11 21:58 UTC). The decision gate at the end selected the `sandbox` host. Spec amendment A-3 is applied (v1.0.3); A-4 is proposed and waits for the user.
+> **Status: accepted (2026-10-12).** Both systems are measured: macOS locally and in CI, Windows in CI ([run 38178105506](https://github.com/kivancturker/atabey/actions/runs/38178105506), commit `c126dc3`, `windows-latest`, 2026-10-11 21:58 UTC). The decision gate at the end selected the `sandbox` host. Spec amendments A-3 (v1.0.3) and A-4 (v1.0.4) are applied.
 
 ## Context
 
@@ -32,7 +32,7 @@ Serve extension pages from `atabey-ext://sandbox/<extension id>/…` (Windows: `
 
 | Header | Value | Why |
 |---|---|---|
-| `Content-Security-Policy` | `default-src <origin>/<extension id>/` | **Amends §5.12** (`default-src 'self'` does not work, see below; proposed amendment A-4). Page can load only its own folder |
+| `Content-Security-Policy` | `default-src <origin>/<extension id>/` | **Amends §5.12** (`default-src 'self'` does not work, see below; amendment A-4). Page can load only its own folder |
 | `Access-Control-Allow-Origin` | `null` | Module scripts and `fetch()` from an opaque-origin page are CORS requests |
 | `X-Content-Type-Options` / `Cache-Control` | `nosniff` / `no-store` | Module scripts need a JavaScript MIME type; no stale UI |
 
@@ -122,7 +122,7 @@ flowchart TD
 | Gate question | Answer | Outcome |
 |---|---|---|
 | `isolated-host` safe and functional on both? | Yes (macOS and Windows: 0 canary hits, 0 breach events, all functional checks ok) | **`isolated-host` selected; ADR accepted** |
-| Folder-scoped CSP and CORS `null` work on Windows? | Yes (Windows finding 6) | A-3 applied (spec v1.0.3, `tauri.conf.json`); A-4 proposed in spec §8 |
+| Folder-scoped CSP and CORS `null` work on Windows? | Yes (Windows finding 6) | A-3 applied (spec v1.0.3, `tauri.conf.json`); A-4 applied (spec v1.0.4, approved by the user 2026-10-12) |
 
 ## Alternatives considered
 
@@ -143,6 +143,6 @@ Other tools for context: VS Code serves webviews from a unique `vscode-webview:/
 | T-22 (extension host) | Reuses `ext_scheme.rs` (parse, traversal rejection, headers, URL forms; `respond` serves the `sandbox` host only). Serves installed extensions instead of the embedded fixtures. **Never** put `ipc:`, `http://ipc.localhost` or the app origin into an extension's `connect-src`: on Windows the iframe holds the invoke key, and the page CSP is one of the layers in front of it. No secure-context APIs in extension UIs on Windows (finding 5). `PanelSlot` has no `Bottom` although §5.10's manifest and R-37 use a bottom panel: fix there |
 | T-24 (security E2E) | Replaces the fixtures with the real extension host and asserts AC-17 "and logged" through Defter. Worth adding there: a Windows run with `connect-src http://ipc.localhost` forced through `ATABEY_PROBE_CSP`, to measure the `Origin: null` refusal on its own |
 | T-25 | Add the "probe feature is off in release builds" check |
-| Spec | Amendment **A-3** (applied, v1.0.3): main-window CSP gains `frame-src atabey-ext://sandbox http://atabey-ext.sandbox`. With only this list the `localhost` frame is blocked and the `sandbox` frame loads (measured on macOS, 2026-10-12; the probe widens the list at run time to keep measuring `localhost`). Amendment **A-4** (proposed, waits for the user): the §5.12 extension-page CSP row changes from `default-src 'self'` to the folder-scoped form, plus the CORS header |
+| Spec | Amendment **A-3** (applied, v1.0.3): main-window CSP gains `frame-src atabey-ext://sandbox http://atabey-ext.sandbox`. With only this list the `localhost` frame is blocked and the `sandbox` frame loads (measured on macOS, 2026-10-12; the probe widens the list at run time to keep measuring `localhost`). Amendment **A-4** (applied, v1.0.4): the §5.12 extension-page CSP row changes from `default-src 'self'` to the folder-scoped form, plus the CORS header |
 | Probe in release | Double gate: cargo feature `isolation-probe` and the `--isolation-probe` flag. `ATABEY_PROBE_CSP` and `ATABEY_PROBE_ACAO` (experiment hooks that replace response headers) exist only in probe builds |
 | Reversal | Replace the iframe host with dedicated webviews; the bridge protocol (`postMessage` + `event.source` authentication) carries over |

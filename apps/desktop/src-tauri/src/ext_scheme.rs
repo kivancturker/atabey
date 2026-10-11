@@ -29,10 +29,10 @@ pub const ISOLATED_HOST: &str = "sandbox";
 /// refuses it; only the probe serves it (through [`respond_on_hosts`]) to keep measuring it.
 pub const LOCALHOST_HOST: &str = "localhost";
 
-/// What S0 spec §5.12 prescribes for extension pages. It does **not** work: in a sandboxed
-/// (opaque-origin) document WebKit does not match `'self'`, so the page's own scripts, styles and
-/// JSON are blocked (measured by the T-04 spike, ADR-0007). Kept only so the spike can show the
-/// difference; [`extension_csp`] is what is served.
+/// What S0 spec §5.12 prescribed for extension pages before amendment A-4. It does **not** work:
+/// in a sandboxed (opaque-origin) document `'self'` matches nothing, so the page's own scripts,
+/// styles and JSON are blocked (measured by the T-04 spike, ADR-0007). Kept only so the spike can
+/// show the difference; [`extension_csp`] is what is served.
 pub const SPEC_CSP: &str = "default-src 'self'";
 
 /// `Access-Control-Allow-Origin` of every response. A sandboxed page has the origin `null`, and
