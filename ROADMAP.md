@@ -1,6 +1,6 @@
 ---
 doc: roadmap
-updated: 2026-10-11
+updated: 2026-10-12
 source: PRODUCT-SPEC.md (v1.1.0) §4–5 · docs/brainstorm/DECISIONS.md D-025, D-112
 ---
 
@@ -27,8 +27,8 @@ source: PRODUCT-SPEC.md (v1.1.0) §4–5 · docs/brainstorm/DECISIONS.md D-025, 
 
 | Milestone | Tasks | Status |
 |---|---|---|
-| M1 Skeleton & CI | T-01 workspace skeleton · T-02 Tauri shell + CI · T-03 types + codegen · T-04 iframe spike | ✅ T-01, T-02, T-03 merged · 🚧 T-04 in review (ADR-0007 accepted) |
-| M2 Core services | T-05 … T-10 | ⏳ |
+| M1 Skeleton & CI | T-01 workspace skeleton · T-02 Tauri shell + CI · T-03 types + codegen · T-04 iframe spike | ✅ all merged (ADR-0007 accepted) |
+| M2 Core services | T-05 … T-10 | 🚧 T-05 in review (ADR-0010 proposed) |
 | M3 Documents & themes | T-11 … T-17 | ⏳ |
 | M4 Budget & gateway | T-18, T-19 | ⏳ |
 | M5 Extensions & Ulak | T-20 … T-23 | ⏳ |
