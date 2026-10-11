@@ -1,0 +1,18 @@
+{
+  "name": "@atabey/bindings",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Generated TypeScript bindings for Atabey's Tauri commands, events and types. Never edit src/: run `pnpm gen`.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.12.2"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

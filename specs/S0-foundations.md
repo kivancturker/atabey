@@ -2,9 +2,9 @@
 id: S0
 title: Foundations
 status: frozen
-version: 1.0.1
+version: 1.0.2
 frozen: 2026-10-10
-approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1 approved 2026-10-11
+approved-in: v0.5-Q12 (frozen as drafted, round-5 answers applied); A-1, A-2 approved 2026-10-11
 depends_on: []
 product-spec: ../PRODUCT-SPEC.md (v1.1.0)
 constitution: ../CONSTITUTION.md (v1.1.0)
@@ -274,17 +274,27 @@ pub struct ProjectId(pub Uuid);          // UUIDv7, stored in .atabey/project.to
 pub struct CorrelationId(pub Uuid);      // one per user-initiated flow
 pub struct ExtensionId(pub String);      // "atabey.defter-viewer"
 
-#[derive(Serialize, Deserialize, specta::Type, JsonSchema, thiserror::Error, Debug)]
+// A-2: wire form { code, ...fields, message }, e.g. { "code": "not_found", "what": "README.md", "message": "Not found: README.md" }
+#[derive(Serialize, Deserialize, specta::Type, JsonSchema, Debug)]
+pub struct AtabeyError {
+    #[serde(flatten)] pub kind: ErrorKind,
+    pub message: String,                 // ErrorKind's Display, written once in Rust
+}
+pub type IpcResult<T> = Result<T, AtabeyError>;  // every Tauri command returns this
+
+#[derive(Serialize, Deserialize, specta::Type, JsonSchema, Debug)]
 #[serde(tag = "code", rename_all = "snake_case")]
-pub enum AtabeyError {
+pub enum ErrorKind {                     // fields never named `code` or `message`
     NotFound { what: String },
     InvalidInput { field: String, reason: String },
     PermissionDenied { extension: ExtensionId, needed: Permission },
     BudgetPaused { request: BudgetRequestId, needed_usd: Decimal, cap: CapKind },
-    Provider { provider: ProviderId, status: Option<u16>, message: String },
-    Timeout { after_ms: u64 },
-    Internal { message: String },        // logged with full detail in Defter, short text to GUI
+    Provider { provider: ProviderId, status: Option<u16>, detail: String },
+    Timeout { after_ms: u32 },           // TS numbers can't hold every u64
+    Internal { summary: String },        // logged with full detail in Defter, short text to GUI
 }
+// Also in atabey-types (A-2), because AtabeyError needs them: CapKind, Permission, PanelSlot,
+// HostPattern, BudgetRequestId, ProviderId
 
 // atabey-docs
 pub struct Document { pub path: RelPath, pub frontmatter: Option<Frontmatter>, pub blocks: Vec<Block> }
@@ -313,10 +323,10 @@ pub enum Actor { User, Core, Extension(ExtensionId), Agent(String), Provider(Pro
 
 // atabey-llm
 pub struct Money(Decimal);               // USD, never f64
-pub enum CapKind { Daily, Monthly }
+pub enum CapKind { Daily, Monthly }   // defined in atabey-types (A-2)
 pub struct BudgetState { pub today: Money, pub month: Money, pub daily_cap: Money, pub monthly_cap: Money }
 
-// atabey-ext-host
+// atabey-ext-host (Permission itself is defined in atabey-types, A-2)
 pub enum Permission { UlakCommand(String), UlakSubscribe(String), UlakEmit(String),
     UiPanel(PanelSlot), ReadProjectFiles, Network(HostPattern) }
 ```
@@ -610,6 +620,7 @@ flowchart LR
 | ID | Date | Change | Status |
 |---|---|---|---|
 | A-1 | 2026-10-11 | §5.12 CSP row: main window CSP gains `connect-src 'self' ipc: http://ipc.localhost`. Without it, Tauri's IPC custom protocol is blocked in release builds and silently falls back to the slower postMessage bridge (Tauri CSP docs). No change to the rules (still no `unsafe-eval`) | ✅ approved (user, 2026-10-11) → v1.0.1 |
+| A-2 | 2026-10-11 | §5.4: `AtabeyError` becomes `{ kind: ErrorKind, message }` (kind flattened and tagged by code), plus `IpcResult<T>`. `Provider.message` → `detail`, `Internal.message` → `summary` (no clash with the flattened `message`). `Timeout.after_ms` is `u32` (specta refuses `u64` for TypeScript). `CapKind`, `Permission`, `PanelSlot`, `HostPattern`, `BudgetRequestId`, `ProviderId` live in `atabey-types`. Resolves the clash between R-5 ("code + message + details") and the §5.4 sketch, which had no message. Details in ADR-0009 | ✅ approved (user, 2026-10-11, T-03 planning) → v1.0.2 |
 
 ## 9. Sources
 

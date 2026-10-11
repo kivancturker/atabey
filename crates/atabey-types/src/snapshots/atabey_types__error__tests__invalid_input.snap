@@ -1,0 +1,10 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "code": "invalid_input",
+  "field": "path",
+  "message": "Invalid path: must stay inside the project root",
+  "reason": "must stay inside the project root"
+}

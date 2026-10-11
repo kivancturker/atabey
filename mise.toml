@@ -45,6 +45,19 @@ run = [
   "pnpm -r --if-present test",
 ]
 
+[tasks.gen]
+depends = ["web"]
+description = "Regenerate TypeScript bindings and JSON Schemas from Rust types (ADR-0009)"
+run = "pnpm gen"
+
+[tasks.drift]
+depends = ["gen"]
+description = "Fail if the committed bindings or schemas differ from what the Rust types generate"
+run = [
+  "git diff --exit-code -- packages/bindings schemas",
+  "test -z \"$(git ls-files --others --exclude-standard -- packages/bindings schemas)\" || { echo 'Generated files are not committed:'; git ls-files --others --exclude-standard -- packages/bindings schemas; exit 1; }",
+]
+
 [tasks.check]
 description = "Everything CI runs, locally"
-depends = ["lint", "deny", "secrets", "test"]
+depends = ["lint", "deny", "secrets", "test", "drift"]

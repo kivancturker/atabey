@@ -1,0 +1,11 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "code": "provider",
+  "detail": "Rate limit exceeded; retry after 20 s",
+  "message": "openrouter failed (HTTP 429): Rate limit exceeded; retry after 20 s",
+  "provider": "openrouter",
+  "status": 429
+}

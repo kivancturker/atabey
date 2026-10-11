@@ -1,0 +1,9 @@
+---
+source: crates/atabey-types/src/error.rs
+expression: json
+---
+{
+  "code": "internal",
+  "message": "Internal error: the project index is unavailable",
+  "summary": "the project index is unavailable"
+}

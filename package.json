@@ -8,7 +8,8 @@
   },
   "scripts": {
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "gen": "cargo run -q -p atabey-gen && cargo run -q -p atabey-desktop --example export_bindings"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15"
