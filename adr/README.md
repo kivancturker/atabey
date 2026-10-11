@@ -10,6 +10,7 @@
 | [0004](ADR-0004-gix-not-git2.md) | gix instead of git2 | Accepted | 2026-10-10 |
 | [0005](ADR-0005-frontend-stack.md) | Frontend stack | Accepted | 2026-10-10 |
 | [0006](ADR-0006-toolchain-pinning.md) | Toolchain pinning: rust-toolchain.toml + mise + pnpm | Accepted | 2026-10-10 |
+| [0008](ADR-0008-ignore-proc-macro-error-advisory.md) | Ignore RUSTSEC-2024-0370 (proc-macro-error) from Tauri's Linux GTK stack | Accepted | 2026-10-11 |
 
 ## Template
 

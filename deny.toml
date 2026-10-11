@@ -5,7 +5,9 @@ all-features = true
 
 [advisories]
 # RustSec advisories: vulnerable crates fail the check. Add ignores only with a linked ADR.
-ignore = []
+ignore = [
+  "RUSTSEC-2024-0370", # proc-macro-error unmaintained; Tauri Linux GTK3 build-time macro only (ADR-0008)
+]
 
 [licenses]
 confidence-threshold = 0.93

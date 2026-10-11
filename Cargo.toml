@@ -1,8 +1,8 @@
 [workspace]
 resolver = "3"
-# T-02 adds "apps/*/src-tauri", T-23 adds "extensions/*/backend".
+# T-23 adds "extensions/*/backend".
 # (Cargo treats a glob that matches nothing as a literal path, so add each glob when its first crate exists.)
-members = ["crates/*"]
+members = ["crates/*", "apps/*/src-tauri"]
 
 [workspace.package]
 version = "0.1.0"
@@ -16,7 +16,7 @@ publish = false
 # Crates opt in with `foo.workspace = true`; add here first, never in a member crate.
 [workspace.dependencies]
 tauri = "2.12"
-tauri-build = "2.12"
+tauri-build = "2.7"   # versioned independently of tauri (latest 2.7.2, crates.io 2026-10-11)
 tauri-specta = "=2.0.0-rc.25"    # T-03 adds specta + specta-typescript at the exact versions this RC requires
 tokio = { version = "1.53", features = ["rt-multi-thread", "macros", "sync", "time", "process", "io-util", "fs"] }
 serde = { version = "1.0", features = ["derive"] }

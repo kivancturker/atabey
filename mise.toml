@@ -8,17 +8,25 @@ cargo-deny = "0.20.2"                             # licenses + advisories (Const
 gitleaks = "8.30.1"                               # secret scan (Constitution Art. 5)
 "aqua:nextest-rs/nextest/cargo-nextest" = "0.9.148"
 cargo-insta = "1.49.0"                            # snapshot review (S0 T-11+)
+actionlint = "1.7.12"                             # validates .github/workflows locally (no remote yet)
 
 [tasks.fmt]
 description = "Format Rust and TypeScript/JSON"
 run = ["cargo fmt --all", "pnpm exec biome format --write ."]
 
+[tasks.web]
+description = "Build the frontend (Tauri crates need apps/desktop/dist to compile)"
+run = "pnpm --filter @atabey/desktop build"
+
 [tasks.lint]
-description = "Formatting check, clippy, Biome"
+depends = ["web"]
+description = "Formatting check, clippy, Biome, TypeScript type-check, workflow lint"
 run = [
   "cargo fmt --all --check",
   "cargo clippy --workspace --all-targets -- -D warnings",
   "pnpm exec biome check .",
+  "pnpm -r --if-present typecheck",
+  "actionlint",
 ]
 
 [tasks.deny]
@@ -30,6 +38,7 @@ description = "Scan git history for secrets"
 run = "gitleaks git --no-banner --redact"
 
 [tasks.test]
+depends = ["web"]
 description = "Rust and TypeScript tests"
 run = [
   "cargo nextest run --workspace --no-tests=pass",
