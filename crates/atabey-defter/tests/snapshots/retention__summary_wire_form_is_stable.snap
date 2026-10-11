@@ -1,0 +1,88 @@
+---
+source: crates/atabey-defter/tests/retention.rs
+---
+{
+  "schema_version": 1,
+  "project": "01920f4e-7b3a-7c41-9d2e-5a8b6c3d1e0f",
+  "date": "2026-07-13",
+  "compacted_at": "2026-10-12T09:30:15.25Z",
+  "entries": 6,
+  "flows": 4,
+  "first_ts": "2026-07-13T08:00:00Z",
+  "last_ts": "2026-07-13T17:45:09Z",
+  "sessions": [
+    {
+      "session": "01920f4e-8c10-7a55-8f31-2b6d9e4a7c03",
+      "entries": 3,
+      "first_ts": "2026-07-13T08:00:00Z",
+      "last_ts": "2026-07-13T08:12:41Z"
+    },
+    {
+      "session": "01920f4e-9a00-7b10-8c20-3d4e5f607182",
+      "entries": 3,
+      "first_ts": "2026-07-13T17:45:09Z",
+      "last_ts": "2026-07-13T17:45:09Z"
+    }
+  ],
+  "kinds": [
+    {
+      "kind": {
+        "type": "extension_message",
+        "topic": "defter.query"
+      },
+      "count": 1
+    },
+    {
+      "kind": {
+        "type": "ipc_command",
+        "command": "project_open"
+      },
+      "count": 2
+    },
+    {
+      "kind": {
+        "type": "llm_call",
+        "model": "anthropic/claude-sonnet-5"
+      },
+      "count": 1
+    },
+    {
+      "kind": {
+        "type": "user_action",
+        "action": "approve_spec"
+      },
+      "count": 2
+    }
+  ],
+  "actors": [
+    {
+      "actor": "user",
+      "count": 3
+    },
+    {
+      "actor": {
+        "agent": "claude-code"
+      },
+      "count": 1
+    },
+    {
+      "actor": {
+        "extension": "atabey.defter-viewer"
+      },
+      "count": 1
+    },
+    {
+      "actor": {
+        "provider": "openrouter"
+      },
+      "count": 1
+    }
+  ],
+  "outcomes": {
+    "ok": 3,
+    "failed": 1,
+    "denied": 1,
+    "cancelled": 1
+  },
+  "unreadable_lines": 1
+}
