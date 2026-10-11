@@ -14,7 +14,7 @@ status: active
 
 | Tier | When | Who does it | How to run it |
 |---|---|---|---|
-| **H · Hard** | Sets patterns other tasks copy · security · concurrency · poorly documented library integration | **Opus plans, Sonnet implements, Opus reviews** | Session in **plan mode** with model `opusplan` → approve plan → Sonnet executes → `reviewer` subagent (Opus) before the PR |
+| **H · Hard** | Sets patterns other tasks copy · security · concurrency · poorly documented library integration | **Opus plans, Sonnet implements, Opus peeks** | Session in **plan mode** with model `opusplan` → approve plan → Sonnet executes → short **Opus peek** at the diff before the PR (§6) |
 | **M · Standard** | Well-specified feature work following existing patterns | **Sonnet** | Normal session (project default `opusplan` runs Sonnet outside plan mode), or the `implementer` subagent |
 | **L · Mechanical** | Docs tables, fixtures from a list, renames, boilerplate | **Haiku** | `mechanical` subagent (or OpenCode on the Go plan) |
 
@@ -85,13 +85,26 @@ Model choice is only half of it. **Every turn re-sends the whole conversation.**
 | T-25 Release / CSP / capability audit | **H** | Security review |
 | T-26 Slice review + Parking Lot triage | L | Docs, with the user |
 
-**Totals:** 8 H · 16 M · 1 L. Opus is used only for **planning and review** on the 8 H tasks; Sonnet writes all the code.
+**Totals:** 8 H · 16 M · 1 L. Opus is used only for **planning and a short peek** on the 8 H tasks; Sonnet writes all the code.
 
 ## 6. Running a task (checklist)
 
 1. Start a **fresh session** in this repo (the project default model is `opusplan`).
-2. Create the branch: `s0/t-nn-short-name` (from `main`, or from the previous task's branch until it's merged).
-3. **Tier H:** switch to plan mode (Shift+Tab) → "Plan T-nn from specs/S0-foundations.md" → review and approve → execution runs on Sonnet → ask for the `reviewer` subagent → fix the findings.
+2. The agent creates the branch `s0/t-nn-short-name` itself (from `main`, or from the previous task's branch until it's merged). The user doesn't run git commands.
+3. **Tier H:** switch to plan mode (Shift+Tab) → "Plan T-nn from specs/S0-foundations.md" → review and approve → execution runs on Sonnet → **Opus peek** (below) → Sonnet fixes any findings.
    **Tier M:** "Implement T-nn from specs/S0-foundations.md" (runs on Sonnet).
    **Tier L:** "Use the mechanical subagent to …".
 4. `mise run check` green → commit `T-nn: …` → PR (once the GitHub repo exists).
+
+### The Opus peek (Tier H only)
+
+`mise run check` already does the heavy verification (tests, lints, licenses, secrets). The peek is a light second look, not a review pass.
+
+| Do | Don't |
+|---|---|
+| Switch back to plan mode (Shift+Tab) in the **same session** and say *"Peek at the diff"* | Spawn a reviewer subagent (it starts cold and re-reads the spec, the Constitution and the codebase) |
+| Read `git diff --stat`, then only the files the plan marked risky (security, IPC, concurrency) | Read every file, explore the codebase or re-run tests |
+| Compare against the approved plan and the task's acceptance criteria | Rewrite or edit code (Sonnet fixes, outside plan mode) |
+| Report at most 5 real findings, or "looks right" in one line | Style nitpicks |
+
+**Skip it** when the diff matches the plan and the check is green; the human PR review still happens.

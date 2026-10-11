@@ -15,7 +15,7 @@
 
 ## Model routing (Claude Pro limits)
 
-Follow [`docs/process/model-routing.md`](docs/process/model-routing.md): **Tier H** = plan in plan mode (`opusplan`, the project default) → Sonnet executes → `reviewer` subagent (Opus) before the PR; **Tier M** = Sonnet (`implementer` subagent or the main session outside plan mode); **Tier L** = `mechanical` subagent (Haiku). One fresh session per task. Never use Fable (it can bill to usage credits on Pro).
+Follow [`docs/process/model-routing.md`](docs/process/model-routing.md): **Tier H** = plan in plan mode (`opusplan`, the project default) → Sonnet executes → a short **Opus peek** at the diff (plan mode again; read-only, no test runs, no exploring) before the PR; **Tier M** = Sonnet (`implementer` subagent or the main session outside plan mode); **Tier L** = `mechanical` subagent (Haiku). One fresh session per task. **The agent creates the task branch itself** (the user doesn't run git commands). Never use Fable (it can bill to usage credits on Pro).
 
 ## Design rounds (question files)
 
