@@ -2,6 +2,7 @@
 // uses it to prove that module scripts load inside the sandbox, then runs the attack catalogue.
 const probe = window.AtabeyProbe;
 window.__panelStarted = true;
+window.parent.postMessage({ type: "probe.started" }, "*");
 
 const extension = document.documentElement.dataset.extension;
 const params = new URLSearchParams(window.location.hash.slice(1));

@@ -8,6 +8,10 @@
   const CANARY_COMMAND = "probe_canary";
   const BREACH_EVENT = "atabey-probe-breach";
   const FORGED_KEY = "forged-invoke-key";
+  // Where the injected API exists inside an iframe (wry injects it into sub-frames on Windows),
+  // a call may never settle. Keep the wait short so the iframe still reports within its budget;
+  // Rust counts canary hits on its own, however late they arrive.
+  const INJECTED_API_TIMEOUT_MS = 1500;
 
   const describe = (error) => `${error?.name ?? "Error"}: ${error?.message ?? String(error)}`;
   const check = (id, kind, success, detail) => ({
@@ -69,18 +73,28 @@
     // IPC through the injected API.
     const invoke = window.__TAURI_INTERNALS__?.invoke;
     push(
-      await attempt("ipc.internals-invoke", "ipc", async () => {
-        if (!invoke) return [false, "unavailable: no __TAURI_INTERNALS__"];
-        await invoke(CANARY_COMMAND, { who: ctx.who });
-        return [true, "invoke resolved"];
-      }),
+      await attempt(
+        "ipc.internals-invoke",
+        "ipc",
+        async () => {
+          if (!invoke) return [false, "unavailable: no __TAURI_INTERNALS__"];
+          await invoke(CANARY_COMMAND, { who: ctx.who });
+          return [true, "invoke resolved"];
+        },
+        INJECTED_API_TIMEOUT_MS,
+      ),
     );
     push(
-      await attempt("ipc.event-emit", "ipc", async () => {
-        if (!invoke) return [false, "unavailable: no __TAURI_INTERNALS__"];
-        await invoke("plugin:event|emit", { event: BREACH_EVENT, payload: { who: ctx.who } });
-        return [true, "emit resolved"];
-      }),
+      await attempt(
+        "ipc.event-emit",
+        "ipc",
+        async () => {
+          if (!invoke) return [false, "unavailable: no __TAURI_INTERNALS__"];
+          await invoke("plugin:event|emit", { event: BREACH_EVENT, payload: { who: ctx.who } });
+          return [true, "emit resolved"];
+        },
+        INJECTED_API_TIMEOUT_MS,
+      ),
     );
 
     // IPC forged by hand, with a made-up invoke key.

@@ -19,7 +19,9 @@
     const message = event.data ?? {};
     const reply = (body) => event.source.postMessage({ ...body, id: message.id }, "*");
 
-    if (message.type === "probe.ping") {
+    if (message.type === "probe.started") {
+      log(`${frame.extension}: panel.mjs started`);
+    } else if (message.type === "probe.ping") {
       reply({ type: "probe.pong", token: message.token });
     } else if (message.type === "ulak.command") {
       try {

@@ -22,8 +22,9 @@ use crate::ext_scheme::{self, UiAssets};
 
 const FLAG: &str = "--isolation-probe";
 const BREACH_EVENT: &str = "atabey-probe-breach";
-const WATCHDOG: Duration = Duration::from_secs(45);
-const RUN_TIMEOUT_MS: u32 = 7_000;
+// One control run plus four iframe runs must fit: 4 x RUN_TIMEOUT_MS and some slack.
+const WATCHDOG: Duration = Duration::from_secs(120);
+const RUN_TIMEOUT_MS: u32 = 20_000;
 const PROBE_COMMANDS: [&str; 5] = [
     "probe_canary",
     "probe_begin",

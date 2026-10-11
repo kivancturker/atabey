@@ -50,7 +50,7 @@ A build of the real app (production mode, `tauri/custom-protocol`, real CSP, rea
 | `localhost-host` | `atabey-ext://localhost/…` · `http://atabey-ext.localhost/…` | Spec-literal, observed, never fails the run |
 | `isolated-host` | `atabey-ext://sandbox/…` · `http://atabey-ext.sandbox/…` | Candidate, asserted |
 
-Rust observes independently of what the page claims: calls to the canary command, emissions of a probe-only breach event, and every bridge decision (with the sender taken from `event.source`). Exit code 0 = isolated, 1 = breach or missing functional check, 2 = watchdog (45 s). A sabotage run with `allow-same-origin` added made it exit 1 (storage reachable).
+Rust observes independently of what the page claims: calls to the canary command, emissions of a probe-only breach event, and every bridge decision (with the sender taken from `event.source`). Exit code 0 = isolated, 1 = breach or missing functional check, 2 = watchdog (120 s). A sabotage run with `allow-same-origin` added made it exit 1 (storage reachable).
 
 ## Results
 
