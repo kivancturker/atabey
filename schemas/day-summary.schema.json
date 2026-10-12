@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DaySummary",
+  "description": "The on-disk form of `<defter root>/<project-id>/summaries/YYYY-MM-DD.json`: what a project's\nledger said on one UTC day, after the raw files are gone. Counts only; the entries' `summary`\ntext and `data` are never copied. Every list is sorted, so the file is stable.",
+  "type": "object",
+  "properties": {
+    "actors": {
+      "description": "Entries per actor, sorted by the actor's JSON form.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ActorCount"
+      }
+    },
+    "compacted_at": {
+      "description": "When the day was compacted (UTC, RFC 3339).",
+      "type": "string"
+    },
+    "date": {
+      "description": "The UTC day, `YYYY-MM-DD`.",
+      "type": "string"
+    },
+    "entries": {
+      "description": "How many entries could be read.",
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "first_ts": {
+      "description": "The earliest entry, if any entry could be read.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "flows": {
+      "description": "How many distinct flows (correlation ids) those entries belong to.",
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "kinds": {
+      "description": "Entries per kind, sorted by the kind's JSON form.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/KindCount"
+      }
+    },
+    "last_ts": {
+      "description": "The latest entry, if any entry could be read.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcomes": {
+      "description": "Entries per outcome.",
+      "$ref": "#/$defs/OutcomeCounts"
+    },
+    "project": {
+      "description": "The project the entries belong to.",
+      "$ref": "#/$defs/ProjectId"
+    },
+    "schema_version": {
+      "description": "Format version of this file. Currently 1.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "sessions": {
+      "description": "One row per session file, sorted by session id.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SessionSummary"
+      }
+    },
+    "unreadable_lines": {
+      "description": "Lines that were not a valid ledger entry (cut off by a crash, or garbage).",
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "project",
+    "date",
+    "compacted_at",
+    "entries",
+    "flows",
+    "sessions",
+    "kinds",
+    "actors",
+    "outcomes",
+    "unreadable_lines"
+  ],
+  "$defs": {
+    "Actor": {
+      "description": "Who caused an entry.",
+      "oneOf": [
+        {
+          "description": "The person using the app.",
+          "type": "string",
+          "const": "user"
+        },
+        {
+          "description": "Atabey itself.",
+          "type": "string",
+          "const": "core"
+        },
+        {
+          "description": "An extension.",
+          "type": "object",
+          "properties": {
+            "extension": {
+              "$ref": "#/$defs/ExtensionId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "extension"
+          ]
+        },
+        {
+          "description": "A coding agent or an observer, by name.",
+          "type": "object",
+          "properties": {
+            "agent": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "agent"
+          ]
+        },
+        {
+          "description": "A model provider.",
+          "type": "object",
+          "properties": {
+            "provider": {
+              "$ref": "#/$defs/ProviderId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "provider"
+          ]
+        }
+      ]
+    },
+    "ActorCount": {
+      "description": "How many entries one [`Actor`] caused.",
+      "type": "object",
+      "properties": {
+        "actor": {
+          "description": "The actor.",
+          "$ref": "#/$defs/Actor"
+        },
+        "count": {
+          "description": "How many entries.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "actor",
+        "count"
+      ]
+    },
+    "EntryKind": {
+      "description": "What happened. The four sources R-21 lists, plus `system` for events of Atabey's own.\nAdding a variant later is a compatible change for readers that ignore unknown kinds.",
+      "oneOf": [
+        {
+          "description": "Something the user did in the GUI, e.g. `open_project`.",
+          "type": "object",
+          "properties": {
+            "action": {
+              "description": "The action's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "user_action"
+            }
+          },
+          "required": [
+            "type",
+            "action"
+          ]
+        },
+        {
+          "description": "A Tauri command, e.g. `project_open`.",
+          "type": "object",
+          "properties": {
+            "command": {
+              "description": "The command's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "ipc_command"
+            }
+          },
+          "required": [
+            "type",
+            "command"
+          ]
+        },
+        {
+          "description": "A message an extension sent or received over Ulak.",
+          "type": "object",
+          "properties": {
+            "topic": {
+              "description": "The Ulak topic or command, e.g. `defter.query`.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "extension_message"
+            }
+          },
+          "required": [
+            "type",
+            "topic"
+          ]
+        },
+        {
+          "description": "A call to a model provider.",
+          "type": "object",
+          "properties": {
+            "model": {
+              "description": "The model id, e.g. `anthropic/claude-sonnet-5`.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "llm_call"
+            }
+          },
+          "required": [
+            "type",
+            "model"
+          ]
+        },
+        {
+          "description": "An event inside Atabey that no user action triggered, e.g. a retention run.",
+          "type": "object",
+          "properties": {
+            "event": {
+              "description": "The event's name.",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "const": "system"
+            }
+          },
+          "required": [
+            "type",
+            "event"
+          ]
+        }
+      ]
+    },
+    "ExtensionId": {
+      "description": "An extension's reverse-DNS id, e.g. `atabey.defter-viewer`.",
+      "type": "string"
+    },
+    "KindCount": {
+      "description": "How many entries had one [`EntryKind`].",
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "How many entries.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "kind": {
+          "description": "The kind.",
+          "$ref": "#/$defs/EntryKind"
+        }
+      },
+      "required": [
+        "kind",
+        "count"
+      ]
+    },
+    "OutcomeCounts": {
+      "description": "Entries per [`Outcome`] (the failure code and denial reason are dropped).",
+      "type": "object",
+      "properties": {
+        "cancelled": {
+          "description": "[`Outcome::Cancelled`].",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "denied": {
+          "description": "[`Outcome::Denied`].",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "failed": {
+          "description": "[`Outcome::Failed`].",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "ok": {
+          "description": "[`Outcome::Ok`].",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "ok",
+        "failed",
+        "denied",
+        "cancelled"
+      ]
+    },
+    "ProjectId": {
+      "description": "Identifies an opened project. Stored in `.atabey/project.toml`.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "ProviderId": {
+      "description": "A model provider's id, e.g. `openrouter`.",
+      "type": "string"
+    },
+    "SessionId": {
+      "description": "Identifies one app run. The Defter ledger writes one `<session-id>.jsonl` file per session.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "SessionSummary": {
+      "description": "One session's share of a [`DaySummary`].",
+      "type": "object",
+      "properties": {
+        "entries": {
+          "description": "How many entries could be read from its file.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "first_ts": {
+          "description": "Its earliest entry.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_ts": {
+          "description": "Its latest entry.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "session": {
+          "description": "The session.",
+          "$ref": "#/$defs/SessionId"
+        }
+      },
+      "required": [
+        "session",
+        "entries"
+      ]
+    }
+  }
+}

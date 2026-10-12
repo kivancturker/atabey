@@ -5,7 +5,7 @@
 
 use std::path::{Path, PathBuf};
 
-use atabey_defter::LedgerEntry;
+use atabey_defter::{DaySummary, LedgerEntry};
 use atabey_types::AtabeyError;
 use schemars::{Schema, schema_for};
 
@@ -18,6 +18,8 @@ pub fn schemas() -> Vec<(&'static str, Schema)> {
         ("atabey-error.schema.json", schema_for!(AtabeyError)),
         // One line of the Defter ledger (R-21); readers of `.jsonl` files validate against it.
         ("ledger-entry.schema.json", schema_for!(LedgerEntry)),
+        // A compacted ledger day in `<project>/summaries/` (R-24, ADR-0012).
+        ("day-summary.schema.json", schema_for!(DaySummary)),
     ]
 }
 

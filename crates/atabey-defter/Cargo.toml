@@ -1,6 +1,6 @@
 [package]
 name = "atabey-defter"
-description = "Defter: the append-only ledger (JSON Lines), correlation ids, app-log setup and secret redaction (specs/S0-foundations.md R-21, R-22, R-23)"
+description = "Defter: the append-only ledger (JSON Lines), correlation ids, app-log setup, secret redaction and retention (specs/S0-foundations.md R-21, R-22, R-23, R-24)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

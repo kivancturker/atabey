@@ -15,6 +15,7 @@
 | [0009](ADR-0009-ipc-bindings-export-and-error-audit.md) | IPC bindings: export path, error shape and error-type audit | Accepted | 2026-10-11 |
 | [0010](ADR-0010-defter-ledger-time-and-kinds.md) | Defter ledger: the time crate, UTC day folders, entry kinds and the clock seam | Accepted | 2026-10-12 |
 | [0011](ADR-0011-redaction.md) | Redaction: known-secret matcher, pattern rules and the two write choke points | Proposed | 2026-10-12 |
+| [0012](ADR-0012-defter-retention-and-day-summaries.md) | Defter retention: day summaries, the daily job and what it may touch | Proposed | 2026-10-12 |
 
 ## Template
 

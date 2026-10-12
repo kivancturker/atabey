@@ -10,7 +10,11 @@
 //!   matches a secret pattern, with `«redacted:<kind>»` before a ledger entry, a log line or an
 //!   IPC error is written (R-23, ADR-0011).
 //!
-//! Timestamps and day folders are UTC (ADR-0010). Retention (T-07) is not part of this crate yet.
+//! * **Retention** ([`Retention`]) compacts ledger days older than 90 days into per-day
+//!   [`DaySummary`] files kept forever and deletes app logs older than 14 days, at startup and
+//!   daily (R-24, ADR-0012).
+//!
+//! Timestamps and day folders are UTC (ADR-0010).
 
 mod applog;
 mod clock;
@@ -18,6 +22,7 @@ mod entry;
 mod error;
 mod ledger;
 mod redact;
+mod retention;
 
 pub use applog::{AppLog, LogFormat, app_log, init_app_log};
 pub use clock::{Clock, ManualClock, SystemClock};
@@ -25,3 +30,7 @@ pub use entry::{Actor, EntryDraft, EntryKind, LedgerEntry, Outcome, Timestamp};
 pub use error::{DefterError, LogError};
 pub use ledger::{Flow, Ledger};
 pub use redact::{KnownSecret, RedactError, RedactionKind, Redactor};
+pub use retention::{
+    ActorCount, CompactedDay, DaySummary, KindCount, OutcomeCounts, Retention, RetentionFailure,
+    RetentionPolicy, RetentionReport, RetentionWorker, SessionSummary,
+};
